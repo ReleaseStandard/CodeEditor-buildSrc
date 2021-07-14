@@ -1,0 +1,30 @@
+/**
+ *
+ * This script provide allow complication of plugins in their own tree
+ *
+ *
+ */
+rootProject.name = projectName
+
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+		debug="ok"
+	}
+}
+def intro() {
+	p "Loaded (rootDir="+rootDir+") ..."
+}
+
+intro()
+
+rootDir.eachDirRecurse { dir ->
+  if ( ! ( dir.name.equals("buildSrc") ) && new File(dir, 'build.gradle').exists()) {
+    def pname = ":${rootProject.name}:${dir.name}"
+    p "pname=${pname}"
+    include("${pname}")
+    project("${pname}").projectDir = file("${dir.name}")
+  }
+}
+
