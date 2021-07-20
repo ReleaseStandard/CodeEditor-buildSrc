@@ -1,0 +1,6 @@
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+	}
+}

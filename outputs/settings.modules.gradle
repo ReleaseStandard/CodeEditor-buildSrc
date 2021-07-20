@@ -1,3 +1,9 @@
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+	}
+}
 rootDir.eachDirRecurse { dir ->
   if ( ! ( dir.name.equals("buildSrc") )
 	&& new File(dir, 'build.gradle').exists()
@@ -11,3 +17,21 @@ rootDir.eachDirRecurse { dir ->
     }
   }
 }
+/**
+ *
+ * This script provide allow complication of plugins in their own tree
+ *
+ *
+ */
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+		debug="ok"
+	}
+}
+def intro() {
+	p "Loaded (rootDir="+rootDir+") ..."
+}
+
+intro()
