@@ -4,8 +4,6 @@
  *
  *
  */
-rootProject.name = projectName
-
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {
@@ -18,13 +16,3 @@ def intro() {
 }
 
 intro()
-
-rootDir.eachDirRecurse { dir ->
-  if ( ! ( dir.name.equals("buildSrc") ) && new File(dir, 'build.gradle').exists()) {
-    def pname = ":${rootProject.name}:${dir.name}"
-    p "pname=${pname}"
-    include("${pname}")
-    project("${pname}").projectDir = file("${dir.name}")
-  }
-}
-
