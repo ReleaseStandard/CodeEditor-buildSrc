@@ -1,3 +1,6 @@
+// All modules (CodeEditor modules) must have the same settings in entry
+// this script play this role
+
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {

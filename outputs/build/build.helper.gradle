@@ -7,8 +7,9 @@ def info(msg) {
 def debug(msg) {
 	project.logger.debug(prefix(msg))
 }
-info("Script inclusion")
 
+info("Script inclusion")
+ 
 configurations {
 	all {
 		resolutionStrategy {
@@ -54,22 +55,24 @@ configurations {
 }
 
 
-
 /**
  * Relative include for subprojects
  */
 def implementationR(path) {
-	def parent = project.getParent()
-	def modsRoot = ""
-	if ( parent != null ) {
-		modsRoot = parent.getPath()
-	}
-	def p = modsRoot + path
-	debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
-	dependencies {
-		implementation project(path: p)
-	}
+        def parent = project.getParent()
+        def modsRoot = ""
+        if ( parent != null ) {
+                modsRoot = parent.getPath()
+        }
+        def p = modsRoot + path
+        debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
+        dependencies {
+                implementation project(path: p)
+        }
 }
+
 project.ext.set("implementationR",{ String path ->
 	implementationR(path)
 })
+
+
