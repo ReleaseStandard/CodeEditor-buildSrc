@@ -1,7 +1,12 @@
-def info(msg) {
-	project.logger.info(msg)
+def prefix(msg) {
+	return "[TEST]" + msg
 }
-
+def info(msg) {
+	project.logger.info(prefix(msg))
+}
+def debug(msg) {
+	project.logger.debug(prefix(msg))
+}
 info("Script inclusion")
 
 configurations {
@@ -49,13 +54,20 @@ configurations {
 }
 
 
+
 /**
  * Relative include for subprojects
  */
 def implementationR(path) {
-	def modsRoot = project.getParent().getPath()
+	def parent = project.getParent()
+	def modsRoot = ""
+	if ( parent != null ) {
+		modsRoot = parent.getPath()
+	}
+	def p = modsRoot + path
+	debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
 	dependencies {
-		implementation project(path: modsRoot + path)
+		implementation project(path: p)
 	}
 }
 project.ext.set("implementationR",{ String path ->
