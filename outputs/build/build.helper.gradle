@@ -10,57 +10,6 @@ def debug(msg) {
 
 info("Script inclusion")
 
-configurations {
-	all {
-		resolutionStrategy {
-	           dependencySubstitution.all { DependencySubstitution dependency ->
-
-			if ( dependency.requested instanceof ModuleComponentSelector ) {			
-
-				if ( buildFromLocal instanceof String ) {
-
-				   // tweak remote dependencie resolution
-				   if ( requested.group == "com.github.ReleaseStandard" ) {
-
-					def modPath = ":" + requested.getModule()
-					def module = rootProject.findProject(modPath)
-					if ( module == null ) {
-						println "[ERROR] " + modPath + " not found"
-					}
-
-					//
-					def modCount = 0
-					module.subprojects { Project p ->
-						modCount = modCount + 1
-					}
-					if ( modCount == 1 ) {
-						println "Module alone : in " + modPath
-						module.subprojects { Project p ->
-							dependency.useTarget p
-						}
-					} else if ( modCount > 1 ) {
-						def DH = project.getDependencies()
-						module.subprojects { Project p ->
-							HashMap<String,Object> hm = new HashMap();
-							hm.put("path", p.getPath());
-							Dependency d = DH.project(hm)
-							if ( d == null ) {
-								println "[ERROR] during dependency adding ..."
-							}
-						}
-						println "Multiple module detected in " + modPath + ", I don't know which to choose ..."
-					}
-                                   }
-
-
-				}
-			}
-	           }
-		}
-	}
-}
-
-
 /**
  * Relative include for subprojects
  */
@@ -78,7 +27,63 @@ def implementationR(path) {
 }
 
 project.ext.set("implementationR",{ String path ->
-	implementationR(path)
+        implementationR(path)
 })
 
+configurations {
+	all {
+		resolutionStrategy {
+	           dependencySubstitution.all { DependencySubstitution dependency ->
 
+			if ( requested instanceof ProjectComponentSelector ) {
+				println "This is a project dependencies"
+			}
+			else if ( requested instanceof ModuleComponentSelector ) {			
+
+				if ( buildFromLocal instanceof String ) {
+
+				   //println "requested=" + requested.getClass() + ",dependency=" + dependency.getClass()
+				   // tweak remote dependencie resolution
+				   // hack : plugins have "master-SNAPSHOT" in version number
+				   if ( requested.group == "com.github.ReleaseStandard" ) {
+
+					info " requested("+requested.getClass()+"): group=" + requested.group + ",module=" + requested.getModule() + ",version=" + requested.getVersion() + ",displayName=" + requested.getDisplayName()
+					def modPath = ":" + requested.getModule()
+					def module = rootProject.findProject(modPath)
+					if ( module == null ) {
+						info("[ERROR] " + modPath + " not found")
+						//dependency "ok"
+					}
+					else {
+						//
+						def modCount = 0
+						module.subprojects { Project p ->
+							modCount = modCount + 1
+						}
+						if ( modCount == 1 ) {
+							info("  -> Module alone : in " + modPath)
+							module.subprojects { Project p ->
+								dependency.useTarget p
+							}
+						} else if ( modCount > 1 ) {
+							info("  -> Add dependencies of " + modPath)
+							def DH = rootProject.getDependencies()
+							module.subprojects { Project p ->
+								HashMap<String,Object> hm = new HashMap();
+								hm.put("path", p.getPath());
+								info("    " + p.getPath())
+								Dependency d = DH.project(hm)
+								if ( d == null ) {
+									info("     [ERROR] during dependency adding ...")
+								}
+								//implementationR ":CodeEditor-editor:model"
+							}
+	                                   }
+	                            }
+				}
+			     }
+			}
+	           }
+		}
+	}
+}
