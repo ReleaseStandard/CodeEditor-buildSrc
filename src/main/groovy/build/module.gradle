@@ -1,4 +1,5 @@
 apply from: 'buildSrc/outputs/build/build.module.gradle'
+apply plugin: 'java'
 
 buildscript {
 	repositories {
