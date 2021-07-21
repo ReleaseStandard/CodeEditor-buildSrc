@@ -9,7 +9,7 @@ def debug(msg) {
 }
 
 info("Script inclusion")
- 
+
 configurations {
 	all {
 		resolutionStrategy {
@@ -22,29 +22,35 @@ configurations {
 				   // tweak remote dependencie resolution
 				   if ( requested.group == "com.github.ReleaseStandard" ) {
 
-					def g = dependency.requested
-					def prj = ":" + g.getModule()
-
-	                                info("use from the local codebase: " + g.getGroup() + ":" + g.getModule() + ":" + g.getVersion() + "->" + prj)
-					prj = ":CodeEditor-logger-debug:logger-debug"
-
-					//def targetProject = rootProject.findProject(prj)
-					//if (targetProject != null) {
-					def projet = rootProject.findProject(":CodeEditor-logger-debug:logger-debug")
-					//def projet = rootProject.findProject("")
-					if ( projet == null ) {
-						println "[ERROR] :CodeEditor-logger-debug not found"
+					def modPath = ":" + requested.getModule()
+					def module = rootProject.findProject(modPath)
+					if ( module == null ) {
+						println "[ERROR] " + modPath + " not found"
 					}
-					println "root=" + rootProject.getBuildDir().getPath()
-					println "projet.class=" + projet.getClass()
-					dependency.useTarget projet
 
-					//dependency.useTarget rootProject.project(":CodeEditor-logger-debug")
-					//} else {
-					//	println "Error : project not found"
-					//}
+					//
+					def modCount = 0
+					module.subprojects { Project p ->
+						modCount = modCount + 1
+					}
+					if ( modCount == 1 ) {
+						println "Module alone : in " + modPath
+						module.subprojects { Project p ->
+							dependency.useTarget p
+						}
+					} else if ( modCount > 1 ) {
+						def DH = project.getDependencies()
+						module.subprojects { Project p ->
+							HashMap<String,Object> hm = new HashMap();
+							hm.put("path", p.getPath());
+							Dependency d = DH.project(hm)
+							if ( d == null ) {
+								println "[ERROR] during dependency adding ..."
+							}
+						}
+						println "Multiple module detected in " + modPath + ", I don't know which to choose ..."
+					}
                                    }
-				   println "group=" + requested.getGroup() + ",name=" + requested.getModule()
 
 
 				}
