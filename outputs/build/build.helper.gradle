@@ -35,55 +35,52 @@ configurations {
 		resolutionStrategy {
 	           dependencySubstitution.all { DependencySubstitution dependency ->
 
-			if ( requested instanceof ProjectComponentSelector ) {
-				info("This is a project dependencies")
-			}
-			else if ( requested instanceof ModuleComponentSelector ) {			
+                       if ( requested instanceof ProjectComponentSelector ) {
+                               info("This is a project dependencies")
+                       }
+                       else if ( requested instanceof ModuleComponentSelector ) {
 
 				if ( buildFromLocal instanceof String ) {
 
-				   //println "requested=" + requested.getClass() + ",dependency=" + dependency.getClass()
 				   // tweak remote dependencie resolution
-				   // hack : plugins have "master-SNAPSHOT" in version number
 				   if ( requested.group == "com.github.ReleaseStandard" ) {
 
-					info " requested("+requested.getClass()+"): group=" + requested.group + ",module=" + requested.getModule() + ",version=" + requested.getVersion() + ",displayName=" + requested.getDisplayName()
 					def modPath = ":" + requested.getModule()
 					def module = rootProject.findProject(modPath)
 					if ( module == null ) {
 						info("[ERROR] " + modPath + " not found")
-						//dependency "ok"
 					}
-					else {
-						//
-						def modCount = 0
+
+					//
+					def modCount = 0
+					module.subprojects { Project p ->
+						modCount = modCount + 1
+					}
+					if ( modCount == 1 ) {
+						info("  -> Module alone : in " + modPath)
 						module.subprojects { Project p ->
-							modCount = modCount + 1
+							dependency.useTarget p
 						}
-						if ( modCount == 1 ) {
-							info("  -> Module alone : in " + modPath)
-							module.subprojects { Project p ->
-								dependency.useTarget p
+					} else if ( modCount > 1 ) {
+						def DH = project.getDependencies()
+						info("  -> Add dependencies of " + modPath)
+						module.subprojects { Project p ->
+							HashMap<String,Object> hm = new HashMap();
+							hm.put("path", p.getPath());
+							info("    " + p.getPath())
+							Dependency d = DH.project(hm)
+							if ( d == null ) {
+								info("     [ERROR] during dependency adding ...")
 							}
-						} else if ( modCount > 1 ) {
-							info("  -> Add dependencies of " + modPath)
-							def DH = rootProject.getDependencies()
-							module.subprojects { Project p ->
-								HashMap<String,Object> hm = new HashMap();
-								hm.put("path", p.getPath());
-								info("    " + p.getPath())
-								Dependency d = DH.project(hm)
-								if ( d == null ) {
-									info("     [ERROR] during dependency adding ...")
-								}
-								//implementationR ":CodeEditor-editor:model"
-							}
-	                                   }
-	                            }
+						}
+					}
+                                   }
+
+
 				}
-			     }
 			}
 	           }
 		}
 	}
 }
+

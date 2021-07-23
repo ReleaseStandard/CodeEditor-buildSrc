@@ -1,5 +1,9 @@
+//
+// Used to compile a module from CodeEditor (eg editor)
+//
 apply from: 'buildSrc/outputs/build/build.module.gradle'
 apply plugin: 'java'
+apply plugin: 'maven'
 
 buildscript {
 	repositories {
