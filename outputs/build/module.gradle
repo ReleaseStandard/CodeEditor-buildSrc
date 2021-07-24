@@ -1,9 +1,11 @@
 //
 // Used to compile a module from CodeEditor (eg editor)
 //
+group = "io.github.ReleaseStandard"
+
 apply from: 'buildSrc/outputs/build/build.module.gradle'
 apply plugin: 'java'
-apply plugin: 'maven'
+apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
 
 buildscript {
 	repositories {
@@ -14,5 +16,6 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.android.tools.build:gradle:4.2.1"
+	        classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
 	}
 }
