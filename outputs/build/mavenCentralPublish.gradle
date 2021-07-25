@@ -61,13 +61,14 @@ uploadArchives {
       }
 
       pom.project {
-	name name
+	name project.name
         packaging 'jar'
-	description name + ' for CodeEditor'
+	description "${project.name} for CodeEditor"
 	scm {
-		connection 'scm:git:github.com/ReleaseStandard/"+name+".git'
-		developerConnection 'scm:git:ssh://github.com/ReleaseStandard/"+name+".git'
-		url 'https://github.com/ReleaseStandard/' + name
+               connection "scm:git:github.com/ReleaseStandard/${project.name}.git"
+               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
+               url "https://github.com/ReleaseStandard/${project.name}"
+
         }
 
         licenses {
