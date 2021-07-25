@@ -22,10 +22,6 @@ for(Map.Entry<String, String> e : new HashMap(){{
 	}
 }
 
-if ( version == "unspecified" ) {
-        version = '1';
-}
-
 nexusPublishing {
     repositories {
         sonatype {
@@ -38,16 +34,36 @@ nexusPublishing {
     }
 }
 
-task ass(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+task collectSubModules() {
+	doFirst() {
+		project.subprojects { Project p ->
+			apply plugin: 'maven'
+			apply plugin: 'maven-publish'
+			apply plugin: 'signing'
+
+			def folder = 'libs'
+			def lib = layout.buildDirectory.file("${folder}/${p.name}-${version}.jar")
+			def pArtifact = rootProject.artifacts.add("archives", lib.get().getAsFile()) {
+				classifier = "${p.name}"
+			}
+                        println "pArtifact{classifier=${pArtifact.classifier},date=${pArtifact.date},extension=${pArtifact.extension},name=${pArtifact.name},type=${pArtifact.type}}"
+		}
+	}
+}
+task produceBigJar(type: Jar) {
+	dependsOn collectSubModules
 }
 
 artifacts {
-    archives ass
+	archives produceBigJar
 }
 
+
+println ">" + artifacts.getClass()
+def pn = project.name
 uploadArchives {
+  dependsOn collectSubModules
+
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -61,14 +77,14 @@ uploadArchives {
       }
 
       pom.project {
-	name project.name
+	name "${pn}"
         packaging 'jar'
-	description "${project.name} for CodeEditor"
+	artifactId "${pn}"
+	description "${pn} for CodeEditor"
 	scm {
-               connection "scm:git:github.com/ReleaseStandard/${project.name}.git"
-               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
-               url "https://github.com/ReleaseStandard/${project.name}"
-
+               connection "scm:git:github.com/ReleaseStandard/${pn}.git"
+               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${pn}.git"
+               url "https://github.com/ReleaseStandard/${pn}"
         }
 
         licenses {
@@ -99,3 +115,4 @@ signing {
     )
     sign configurations.archives
 }
+

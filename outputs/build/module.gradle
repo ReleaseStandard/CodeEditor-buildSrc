@@ -1,7 +1,10 @@
 //
 // Used to compile a module from CodeEditor (eg editor)
 //
-group = "io.github.ReleaseStandard"
+group = "io.github.ReleaseStandard.CodeEditor"
+if ( version == "unspecified" ) {
+        version = '1';
+}
 
 apply from: 'buildSrc/outputs/build/build.module.gradle'
 apply plugin: 'java'
@@ -16,16 +19,24 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.android.tools.build:gradle:4.2.1"
-	        classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
+		classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
 	}
 }
 
 task newVersion() {
-	def fname = 'gradle.properties'
-	def Properties properties = new Properties()
-	properties.load(project.file(fname).newDataInputStream())
+	
+	doFirst {
 
-        version = Integer.parseInt(version) + 1
-	properties.setProperty('version', version.toString())
-	properties.store(new FileWriter('gradle.properties', false), '')
+		println "[***] New version"
+		def fname = 'gradle.properties'
+		Properties properties = new Properties()
+		properties.load(project.file(fname).newDataInputStream())
+	
+	        version = Integer.parseInt(version) + 1
+		properties.setProperty('version', version.toString())
+		properties.store(new FileWriter('gradle.properties', false), '')
+
+	}
+
 }
+
