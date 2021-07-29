@@ -51,7 +51,18 @@ task collectSubModules() {
 	}
 }
 task produceBigJar(type: Jar) {
-	dependsOn collectSubModules
+        dependsOn collectSubModules
+	project.subprojects { Project p ->
+                def folder = 'libs'
+		def path = "${folder}/${p.name}-${version}.jar"
+	        def lib = layout.buildDirectory.file(path)
+		def bdp = p.getBuildDir().getPath() + "/" + path
+		println "bdp=" + bdp
+		if ( (new File(bdp)).exists() ) {		
+			println "Found"
+			from(zipTree(lib))
+		}
+	}
 }
 
 artifacts {
@@ -62,7 +73,7 @@ artifacts {
 println ">" + artifacts.getClass()
 def pn = project.name
 uploadArchives {
-  dependsOn collectSubModules
+  dependsOn produceBigJar
 
   repositories {
     mavenDeployer {
