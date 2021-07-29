@@ -3,24 +3,29 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
-def Properties properties = new Properties()
-properties.load(project.file("local.properties").newDataInputStream())
-for(Map.Entry<String, String> e : new HashMap(){{
-	put("keyId", "KEYID");
-	put("password", "PASSWORD");
-	put("key", "KEY");
-	put("ossrhUsername", "OSSRH_USERNAME");
-	put("ossrhPassword", "OSSRH_PASSWORD");
-	put("sonatypeStagingProfileId", "SONATYPE_STAGING_PROFILE_ID");
-        put("version", "VERSION");
-}}) {
-	String k = e.getKey();
-	String v = e.getValue();
-	ext[k] = properties.getProperty(k)
-	if ( System.getenv(v) != null ) {
-		ext[k] = System.getenv(v);
+if ( (new File('local.properties')).exists() ) {
+	def Properties properties = new Properties()
+	properties.load(project.file("local.properties").newDataInputStream())
+	for(Map.Entry<String, String> e : new HashMap(){{
+		put("keyId", "KEYID");
+		put("password", "PASSWORD");
+		put("key", "KEY");
+		put("ossrhUsername", "OSSRH_USERNAME");
+		put("ossrhPassword", "OSSRH_PASSWORD");
+		put("sonatypeStagingProfileId", "SONATYPE_STAGING_PROFILE_ID");
+		put("version", "VERSION");
+	}}) {
+		String k = e.getKey();
+		String v = e.getValue();
+		ext[k] = properties.getProperty(k)
+		if ( System.getenv(v) != null ) {
+			ext[k] = System.getenv(v);
+		}
 	}
 }
+
+
+
 
 if ( version == "unspecified" ) {
         version = '1';
