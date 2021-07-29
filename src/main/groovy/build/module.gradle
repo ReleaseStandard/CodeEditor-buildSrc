@@ -37,4 +37,18 @@ task newVersion() {
 		properties.store(new FileWriter('gradle.properties', false), '')
 
 	}
+	doLast {
+                exec {
+                        commandLine "git"
+                        args "add","gradle.properties"
+                }
+                exec {
+                        commandLine "git"
+                        args "commit","-m","update version to ${version}"
+                }
+		exec {
+			commandLine "git"
+			args "tag","${version}"
+		}
+	}
 }
