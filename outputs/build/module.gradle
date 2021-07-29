@@ -19,12 +19,11 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.android.tools.build:gradle:4.2.1"
-		classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
+	        classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
 	}
 }
 
 task newVersion() {
-	
 	doFirst {
 
 		println "[***] New version"
@@ -37,6 +36,4 @@ task newVersion() {
 		properties.store(new FileWriter('gradle.properties', false), '')
 
 	}
-
 }
-

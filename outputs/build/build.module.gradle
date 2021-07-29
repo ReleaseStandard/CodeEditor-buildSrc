@@ -5,7 +5,6 @@ allprojects {
             jcenter() // Warning: this repository is going to shut down soon
             maven { url = 'https://jitpack.io' }
     }
-    def buildBase = rootDir.getPath() + "/buildSrc/outputs/build/"
-    apply from: "${buildBase}build.helper.gradle"
-//    apply from: "${buildBase}mavenCentralPublish.gradle"
+    def helpers = rootDir.getPath() + "/buildSrc/outputs/build/build.helper.gradle"
+    apply from: helpers
 }

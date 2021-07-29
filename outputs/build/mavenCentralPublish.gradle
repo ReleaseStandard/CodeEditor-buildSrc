@@ -22,6 +22,10 @@ for(Map.Entry<String, String> e : new HashMap(){{
 	}
 }
 
+if ( version == "unspecified" ) {
+        version = '1';
+}
+
 nexusPublishing {
     repositories {
         sonatype {
@@ -57,24 +61,18 @@ task produceBigJar(type: Jar) {
 		def path = "${folder}/${p.name}-${version}.jar"
 	        def lib = layout.buildDirectory.file(path)
 		def bdp = p.getBuildDir().getPath() + "/" + path
-		println "bdp=" + bdp
 		if ( (new File(bdp)).exists() ) {		
-			println "Found"
 			from(zipTree(lib))
 		}
 	}
 }
 
 artifacts {
-	archives produceBigJar
+    archives produceBigJar
 }
 
-
-println ">" + artifacts.getClass()
-def pn = project.name
 uploadArchives {
-  dependsOn produceBigJar
-
+  dependsOn produceBigJar  
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -88,14 +86,15 @@ uploadArchives {
       }
 
       pom.project {
-	name "${pn}"
+
+	name project.name
         packaging 'jar'
-	artifactId "${pn}"
-	description "${pn} for CodeEditor"
+	description "${project.name} for CodeEditor"
 	scm {
-               connection "scm:git:github.com/ReleaseStandard/${pn}.git"
-               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${pn}.git"
-               url "https://github.com/ReleaseStandard/${pn}"
+               connection "scm:git:github.com/ReleaseStandard/${project.name}.git"
+               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
+               url "https://github.com/ReleaseStandard/${project.name}"
+
         }
 
         licenses {
@@ -126,4 +125,3 @@ signing {
     )
     sign configurations.archives
 }
-

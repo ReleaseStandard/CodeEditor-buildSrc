@@ -38,16 +38,41 @@ nexusPublishing {
     }
 }
 
-task ass(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+task collectSubModules() {
+	doFirst() {
+		project.subprojects { Project p ->
+			apply plugin: 'maven'
+			apply plugin: 'maven-publish'
+			apply plugin: 'signing'
+
+			def folder = 'libs'
+			def lib = layout.buildDirectory.file("${folder}/${p.name}-${version}.jar")
+			def pArtifact = rootProject.artifacts.add("archives", lib.get().getAsFile()) {
+				classifier = "${p.name}"
+			}
+                        println "pArtifact{classifier=${pArtifact.classifier},date=${pArtifact.date},extension=${pArtifact.extension},name=${pArtifact.name},type=${pArtifact.type}}"
+		}
+	}
+}
+task produceBigJar(type: Jar) {
+        dependsOn collectSubModules
+	project.subprojects { Project p ->
+                def folder = 'libs'
+		def path = "${folder}/${p.name}-${version}.jar"
+	        def lib = layout.buildDirectory.file(path)
+		def bdp = p.getBuildDir().getPath() + "/" + path
+		if ( (new File(bdp)).exists() ) {		
+			from(zipTree(lib))
+		}
+	}
 }
 
 artifacts {
-    archives ass
+    archives produceBigJar
 }
 
 uploadArchives {
+  dependsOn produceBigJar  
   repositories {
     mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -61,6 +86,7 @@ uploadArchives {
       }
 
       pom.project {
+
 	name project.name
         packaging 'jar'
 	description "${project.name} for CodeEditor"
