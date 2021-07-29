@@ -66,9 +66,19 @@ task produceBigJar(type: Jar) {
 		}
 	}
 }
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+ 
 artifacts {
-    archives produceBigJar
+    archives produceBigJar, javadocJar, sourcesJar
 }
 
 uploadArchives {
@@ -90,6 +100,7 @@ uploadArchives {
 	name project.name
         packaging 'jar'
 	description "${project.name} for CodeEditor"
+        url "https://github.com/ReleaseStandard/${project.name}"
 	scm {
                connection "scm:git:github.com/ReleaseStandard/${project.name}.git"
                developerConnection "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
