@@ -56,24 +56,29 @@ task produceBigJar(type: Jar) {
         dependsOn collectSubModules
 
 	doFirst() {
-	        def tasks = project.getTasksByName("jar",true)
-		for( Task t : tasks ) {
-			Project p = t.getProject()
-			if ( p == project ) {
-				continue
-			}
-	                t.getOutputs().getFiles().forEach { File f ->
-				if ( ! f.exists() ) {
-					println "[***] WARNING : " + f.getPath() + " does not exists"
-				} else {
-					rootProject.artifacts.add("archives", f) {
-						classifier = "${p.name}"
-					}
-		                        from(zipTree(f.getPath()))
+		String[] types = ["jar", "bundleReleaseAar"]
+		for( String type : types ) {
+		        def tasks = project.getTasksByName(type,true)
+			for( Task t : tasks ) {
+				Project p = t.getProject()
+				if ( p == project ) {
+					continue
 				}
-	                }
+		                t.getOutputs().getFiles().forEach { File f ->
+					if ( ! f.exists() ) {
+						println "[***] WARNING : " + f.getPath() + " does not exists"
+					} else {
+						println "Found file ${f.getPath()} to add to the archive"
+						rootProject.artifacts.add("archives", f) {
+							classifier = "${p.name}"
+						}
+						if ( type == "jar" ) {
+				                        from(zipTree(f.getPath()))
+						}
+					}
+		                }
+			}
 		}
-
 	}
 
 }
