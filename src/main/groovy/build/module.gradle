@@ -11,6 +11,9 @@ apply plugin: 'java'
 apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
 
 subprojects {
+	group = rootProject.group
+	version = rootProject.version
+
         repositories {
                 google()
                 mavenCentral()
@@ -45,7 +48,7 @@ task newVersion() {
 	
 	        version = Integer.parseInt(version) + 1
 		properties.setProperty('version', version.toString())
-		properties.store(new FileWriter('gradle.properties', false), '')
+		properties.store(new FileWriter(fname, false), '')
 
 	}
 	doLast {
