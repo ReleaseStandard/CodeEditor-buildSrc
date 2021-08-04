@@ -1,8 +1,11 @@
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
+if ( rootProject.compareTo(project) == 0 ) {
+	apply plugin: 'io.github.gradle-nexus.publish-plugin'
+}
+ 
 def Properties properties = new Properties()
 if ( (new File('local.properties')).exists() ) {
 	properties.load(project.file("local.properties").newDataInputStream())
@@ -31,16 +34,18 @@ if ( version == "unspecified" ) {
         version = '1';
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            stagingProfileId = sonatypeStagingProfileId
-            username = ossrhUsername
-            password = ossrhPassword
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
+if ( rootProject.compareTo(project) == 0 ) {
+	nexusPublishing {
+	    repositories {
+	        sonatype {
+	            stagingProfileId = sonatypeStagingProfileId
+	            username = ossrhUsername
+	            password = ossrhPassword
+	            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+	            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+	        }
+	    }
+	}
 }
 
 task collectSubModules() {
