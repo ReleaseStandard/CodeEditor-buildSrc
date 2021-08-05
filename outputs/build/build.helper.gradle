@@ -29,7 +29,7 @@ def implementationR(path) {
         } catch(Exception e) {
                
         }
-	if ( buildFromLocal ) {
+	if ( IsBuildFromLocal ) {
 		String[] parts = p.split(':')
 		p = ""
 		parts[parts.size()-1]="${parent.name}-" + parts[parts.size()-1]
