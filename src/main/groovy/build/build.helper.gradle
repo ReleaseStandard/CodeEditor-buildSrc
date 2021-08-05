@@ -22,7 +22,14 @@ def implementationR(path) {
         def p = modsRoot + path
         debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
 
-	if ( buildFromLocal instanceof String ) {
+        Boolean IsBuildFromLocal = false
+        try {
+                String a = buildFromLocal
+                IsBuildFromLocal = true
+        } catch(Exception e) {
+               
+        }
+	if ( buildFromLocal ) {
 		String[] parts = p.split(':')
 		p = ""
 		parts[parts.size()-1]="${parent.name}-" + parts[parts.size()-1]
