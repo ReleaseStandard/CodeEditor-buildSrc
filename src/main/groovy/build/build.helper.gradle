@@ -21,9 +21,20 @@ def implementationR(path) {
         }
         def p = modsRoot + path
         debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
+
+	if ( buildFromLocal instanceof String ) {
+		String[] parts = p.split(':')
+		p = ""
+		parts[parts.size()-1]="${parent.name}-" + parts[parts.size()-1]
+		for(String part : parts) {
+			p += ":" + part
+		}
+	}
+
         dependencies {
                 implementation project(path: p)
         }
+
 }
 
 project.ext.set("implementationR",{ String path ->

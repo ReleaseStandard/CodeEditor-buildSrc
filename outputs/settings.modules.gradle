@@ -15,8 +15,39 @@ rootDir.eachDirRecurse { dir ->
 	    def pname = dir.getPath().replace(rootProject.getProjectDir().getPath(),"")
 	    pname=pname.replaceAll("/",":")
 	    p "pname=${pname}"
-	    include("${pname}")
-	    project("${pname}").projectDir = file(dir.getPath())
+
+	
+	Boolean IsBuildFromLocal = false
+	try {
+		String a = buildFromLocal
+		IsBuildFromLocal = true
+	} catch(Exception e) {
+		
+	}
+	if ( IsBuildFromLocal ) {
+		String [] parts = dir.getParent().split("/")
+		String lastPart = parts[parts.size()-1]
+		p "lastPart=" + lastPart
+		def lp = lastPart.replaceAll("CodeEditor-?", "")
+		String res = pname
+		if ( lp != "" ) {
+			res = ""
+			String [] parts2 = pname.split(":")
+			parts2[parts2.size() - 1] = lastPart + "-" + parts2[parts2.size()-1]
+	
+			for(String part : parts2) {
+				if ( ! part.equals("") ) {
+					res += ":" + part
+				}
+			}
+		}
+		include("${res}")
+		project("${res}").projectDir = file(dir.getPath())
+	}
+	else {
+		include("${pname}")
+		project("${pname}").projectDir = file(dir.getPath())
+	}
     }
   }
 }
