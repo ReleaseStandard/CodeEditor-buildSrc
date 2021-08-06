@@ -29,6 +29,8 @@ def implementationR(path) {
         } catch(Exception e) {
                
         }
+        // in case we build the project from the top root (include project modules instead of remote dependencies)
+        // => we need to produce uniq names (ex: 'controller' must be 'CodeEditor-controller')
 	if ( IsBuildFromLocal ) {
 		String[] parts = p.split(':')
 		p = ""

@@ -10,8 +10,7 @@ apply from: 'buildSrc/outputs/build/build.module.gradle'
 apply plugin: 'java'
 apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
 
-subprojects {
-	group = rootProject.group
+subprojects { Project p ->
 	version = rootProject.version
 
         repositories {
