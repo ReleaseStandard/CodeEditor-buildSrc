@@ -82,18 +82,21 @@ task sourcesJar(type: Jar) {
 // Maven publish customization and publish
 //
 apply plugin: 'maven-publish'
-apply plugin: 'io.github.gradle-nexus.publish-plugin'
-
-nexusPublishing {
-        repositories {
-                sonatype {
-                        stagingProfileId = sonatypeStagingProfileId
-                        username = ossrhUsername
-                        password = ossrhPassword
-                        nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-                        snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-                }
-        }
+def isRoot = ( rootProject.compareTo(project) == 0 ) 
+if ( isRoot ) {
+	apply plugin: 'io.github.gradle-nexus.publish-plugin'
+ 
+	nexusPublishing {
+	        repositories {
+	                sonatype {
+	                        stagingProfileId = sonatypeStagingProfileId
+	                        username = ossrhUsername
+	                        password = ossrhPassword
+	                        nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+	                        snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+	                }
+	        }
+	}
 }
 
 publishing {
