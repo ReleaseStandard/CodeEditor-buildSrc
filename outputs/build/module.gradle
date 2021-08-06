@@ -9,6 +9,10 @@ if ( version == "unspecified" ) {
 apply from: 'buildSrc/outputs/build/build.module.gradle'
 apply plugin: 'java'
 apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
+if ( (new File('custom.gradle')).exists() ) {
+	apply from: 'custom.gradle'
+}
+
 
 subprojects { Project p ->
 	version = rootProject.version
