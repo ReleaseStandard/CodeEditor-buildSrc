@@ -109,7 +109,7 @@ publishing {
                        groupId = "io.github.ReleaseStandard.CodeEditor"
                        artifactId = project.name.replace("CodeEditor-", "")
                        name = project.name
-                       packaging = 'jar'
+                       packaging = 'aar'
                        description = "${project.name} for CodeEditor"
                        url = "https://github.com/ReleaseStandard/${project.name}"
                        scm {
