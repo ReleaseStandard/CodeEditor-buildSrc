@@ -1,11 +1,6 @@
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-if ( rootProject.compareTo(project) == 0 ) {
-	apply plugin: 'io.github.gradle-nexus.publish-plugin'
-}
- 
 def Properties properties = new Properties()
 if ( (new File('local.properties')).exists() ) {
 	properties.load(project.file("local.properties").newDataInputStream())
@@ -32,20 +27,6 @@ for(Map.Entry<String, String> e : new HashMap(){{
 
 if ( version == "unspecified" ) {
         version = '1';
-}
-
-if ( rootProject.compareTo(project) == 0 ) {
-	nexusPublishing {
-	    repositories {
-	        sonatype {
-	            stagingProfileId = sonatypeStagingProfileId
-	            username = ossrhUsername
-	            password = ossrhPassword
-	            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-	            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-	        }
-	    }
-	}
 }
 
 task collectSubModules() {
@@ -97,56 +78,46 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
- 
-artifacts {
-    archives produceBigJar, javadocJar, sourcesJar
-}
+//
+// Maven publish customization and publish
+//
+apply plugin: 'maven-publish'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
-uploadArchives {
-  dependsOn produceBigJar  
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      pom.project {
-
-	name project.name
-        packaging 'jar'
-	description "${project.name} for CodeEditor"
-        url "https://github.com/ReleaseStandard/${project.name}"
-	scm {
-               connection "scm:git:github.com/ReleaseStandard/${project.name}.git"
-               developerConnection "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
-               url "https://github.com/ReleaseStandard/${project.name}"
-
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+               artifact sourcesJar
+               artifact javadocJar
+               artifact produceBigJar
+               pom {
+                       groupId = "io.github.ReleaseStandard.CodeEditor"
+                       artifactId = project.name.replace("CodeEditor-", "")
+                       name = project.name
+                       packaging = 'jar'
+                       description = "${project.name} for CodeEditor"
+                       url = "https://github.com/ReleaseStandard/${project.name}"
+                       scm {
+                               connection = "scm:git:github.com/ReleaseStandard/${project.name}.git"
+                               developerConnection = "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
+                               url = "https://github.com/ReleaseStandard/${project.name}"
+                       }
+                       developers {
+                               developer {
+                                       id = "ReleaseStandard"
+                                       name = "Release Standard"
+                                       email = "releasestandard@netc.eu"
+                               }
+                       }
+                       licenses {
+                               license {
+                                       name = "The Apache License, Version 2.0"
+                                       url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                               }
+                       }
+               }
         }
-
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-        }
-
-        developers {
-		developer {
-			id = 'ReleaseStandard'
-			name = 'ReleaseStandard'
-			email = 'releasestandard@netc.eu'
-		}        
-	}
-
-      }
     }
-  }
 }
 
 signing {
@@ -155,5 +126,5 @@ signing {
             key,
             password,
     )
-    sign configurations.archives
+    sign publishing.publications.mavenJava
 }
