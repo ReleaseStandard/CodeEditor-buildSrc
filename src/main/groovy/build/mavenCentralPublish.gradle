@@ -20,6 +20,11 @@ for(Map.Entry<String, String> e : new HashMap(){{
 	if ( System.getenv(v) != null ) {
 		ext[k] = System.getenv(v);
 	}
+
+	// github CI seem to initialize environment variables to empty string instead of null
+        if ( ext[k] != null && ext[k].equals("") ) {
+                ext[k] = null;
+        }
 }
 
 
