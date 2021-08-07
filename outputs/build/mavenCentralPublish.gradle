@@ -60,7 +60,8 @@ task produceBigJar(type: Jar) {
 						println "[***] WARNING : " + f.getPath() + " does not exists"
 					} else {
 						println "Found file ${f.getPath()} to add to the archive"
-						rootProject.artifacts.add("archives", f) {
+						// no artifact required
+						project.artifacts.add("archives", f) {
 							classifier = "${p.name}"
 						}
 						if ( type == "jar" ) {
