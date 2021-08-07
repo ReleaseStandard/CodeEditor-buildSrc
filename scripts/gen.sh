@@ -21,8 +21,11 @@ function configure() {
 	> "$VAR"
 }
 function apply() {
-	echo "// $@" >> "$VAR"
-	cat "$@" >> "$VAR"
+       FILES=("$@")
+       FILES=("${FILES[$i]/%.gradle/}")
+       FILES=("${FILES[$i]/%/.gradle}")
+       echo "// ${FILES[@]}" >> "$VAR"
+       cat "${FILES[@]}" >> "$VAR"
 }
 function apply2() {
 	echo "$@" >> "$VAR"
@@ -36,12 +39,12 @@ configure "$Osettings/$o"
 apply2 "// All modules (CodeEditor modules) must have the same settings in entry"
 apply2 "// this script play this role"
 apply2 ""
-apply3 lib.gradle common.gradle modules.gradle
+apply3 lib common modules
 
 
 configure "$Osettings/$o2"
 apply2 "// root project of CodeEditor have common parts with modules so we manage that here"
 apply2 ""
-apply3 lib.gradle common.gradle root.gradle
+apply3 lib common root
 
 cp -r "${g}/build/" "$O"
