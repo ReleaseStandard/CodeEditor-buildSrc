@@ -5,35 +5,43 @@
 
 g=src/main/groovy/
 O=outputs/
-o=settings.modules.gradle
-o2=settings.root.gradle
+Osettings="${O}/settings/"
+Isettings="${g}/settings/"
+Obuild="${O}/build/"
+Ibuild="${g}/build/"
+o=modules.gradle
+o2=root.gradle
 
 VAR=""
 function configure() {
 	VAR="$1"
+	file="${VAR/*\//}"
+	folder="${VAR/%$file/}"
+	mkdir -p "$folder"
 	> "$VAR"
 }
 function apply() {
+	echo "// $@" >> "$VAR"
 	cat "$@" >> "$VAR"
 }
 function apply2() {
 	echo "$@" >> "$VAR"
 }
 function apply3() {
-	for f in "$@" ; do apply "${g}/${f}" ; done
+	for f in "$@" ; do apply "${Isettings}/${f}" ; done
 }
 mkdir -p "$O"
 
-configure "$O/$o"
+configure "$Osettings/$o"
 apply2 "// All modules (CodeEditor modules) must have the same settings in entry"
 apply2 "// this script play this role"
 apply2 ""
-apply3 settings.lib.gradle settings.common.gradle settings.modules.gradle
+apply3 lib.gradle common.gradle modules.gradle
 
 
-configure "$O/$o2"
+configure "$Osettings/$o2"
 apply2 "// root project of CodeEditor have common parts with modules so we manage that here"
 apply2 ""
-apply3 settings.lib.gradle settings.common.gradle settings.root.gradle
+apply3 lib.gradle common.gradle root.gradle
 
 cp -r "${g}/build/" "$O"

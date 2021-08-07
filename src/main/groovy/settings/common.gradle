@@ -1,0 +1,18 @@
+rootDir.eachDirRecurse { dir ->
+  if ( ! ( dir.name.equals("buildSrc") )
+	&& new File(dir, 'build.gradle').exists()
+  ) {
+    if ( ! rootDir.equals(dir.getPath()) ) {
+	    def pname = dir.getPath().replace(rootProject.getProjectDir().getPath(),"")
+	    pname=pname.replaceAll("/",":")
+	    p "pname=${pname}"
+
+            makeInclude(pname, dir)
+    }
+  }
+}
+
+// REQUIREMENTS:
+//
+//  - You must define makeInclude in particular implementations
+//
