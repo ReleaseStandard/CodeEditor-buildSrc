@@ -43,6 +43,15 @@ task collectSubModules() {
 		}
 	}
 }
+
+// use this to add dependency on produceBigJar to assemble task
+//afterEvaluate {
+//	assemble.dependsOn produceBigJar
+//}
+
+//
+// Produce a big jar from jar submodules
+//
 task produceBigJar(type: Jar) {
         dependsOn collectSubModules
 
@@ -59,13 +68,9 @@ task produceBigJar(type: Jar) {
 					if ( ! f.exists() ) {
 						println "[***] WARNING : " + f.getPath() + " does not exists"
 					} else {
-						println "Found file ${f.getPath()} to add to the archive"
-						// no artifact required
-						project.artifacts.add("archives", f) {
-							classifier = "${p.name}"
-						}
 						if ( type == "jar" ) {
-				                        from(zipTree(f.getPath()))
+                                                       println "Found file ${f.getPath()} to add to the archive"
+                                                       from(zipTree(f.getPath()))
 						}
 					}
 		                }
