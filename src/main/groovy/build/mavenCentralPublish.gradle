@@ -27,13 +27,6 @@ for(Map.Entry<String, String> e : new HashMap(){{
         }
 }
 
-
-
-
-if ( version == "unspecified" ) {
-        version = '1';
-}
-
 task collectSubModules() {
 	doFirst() {
 		project.subprojects { Project p ->
