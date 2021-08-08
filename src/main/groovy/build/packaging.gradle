@@ -1,7 +1,7 @@
 //
 // It is up to the module to support zero or more views (if no view given : a java library is maid)
 //
-def vtype = null
+def vtype = ""
 ext["VIEW_PREFIX"] = "view-"
 import org.apache.tools.ant.DirectoryScanner
 
@@ -68,5 +68,16 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 
 } else {
 	apply plugin: 'java'
+	for(Project p : project.subprojects) {
+		if ( ! isAview(p) ) {
+			project.sourceSets { 
+				main {
+					java {
+						srcDirs "${p.name}/src/"
+					}
+				}
+			}
+		}
+	}
 	project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.java }
 }
