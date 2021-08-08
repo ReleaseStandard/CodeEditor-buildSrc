@@ -36,3 +36,4 @@ allprojects {
 
 apply from: "${rootDir.getPath()}/buildSrc/outputs/build/packaging.gradle"
 apply from: "${rootDir.getPath()}/buildSrc/outputs/build/newVersion.gradle"
+apply from: "${rootDir.getPath()}/buildSrc/outputs/build/mavenCentralPublish.gradle"

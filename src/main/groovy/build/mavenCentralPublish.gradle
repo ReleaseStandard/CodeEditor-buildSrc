@@ -37,49 +37,14 @@ task collectSubModules() {
 	}
 }
 
-// use this to add dependency on produceBigJar to assemble task
-//afterEvaluate {
-//	assemble.dependsOn produceBigJar
-//}
-
-//
-// Produce a big jar from jar submodules
-//
-task produceBigJar(type: Jar) {
-        dependsOn collectSubModules
-
-	doFirst() {
-		String[] types = ["jar", "bundleReleaseAar"]
-		for( String type : types ) {
-		        def tasks = project.getTasksByName(type,true)
-			for( Task t : tasks ) {
-				Project p = t.getProject()
-				if ( p == project ) {
-					continue
-				}
-		                t.getOutputs().getFiles().forEach { File f ->
-					if ( ! f.exists() ) {
-						println "[***] WARNING : " + f.getPath() + " does not exists"
-					} else {
-						if ( type == "jar" ) {
-                                                       println "Found file ${f.getPath()} to add to the archive"
-                                                       from(zipTree(f.getPath()))
-						}
-					}
-		                }
-			}
-		}
-	}
-
-}
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
-    from javadoc
+    //from javadoc
 }
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'
-    from sourceSets.main.allSource
+    //from sourceSets.main.allSource
 }
 
 //
@@ -103,47 +68,52 @@ if ( isRoot ) {
 	}
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-               artifact sourcesJar
-               artifact javadocJar
-               artifact produceBigJar
-               pom {
-                       groupId = "io.github.ReleaseStandard.CodeEditor"
-                       artifactId = project.name.replace("CodeEditor-", "")
-                       name = project.name
-                       packaging = 'aar'
-                       description = "${project.name} for CodeEditor"
-                       url = "https://github.com/ReleaseStandard/${project.name}"
-                       scm {
-                               connection = "scm:git:github.com/ReleaseStandard/${project.name}.git"
-                               developerConnection = "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
-                               url = "https://github.com/ReleaseStandard/${project.name}"
-                       }
-                       developers {
-                               developer {
-                                       id = "ReleaseStandard"
-                                       name = "Release Standard"
-                                       email = "releasestandard@netc.eu"
-                               }
-                       }
-                       licenses {
-                               license {
-                                       name = "The Apache License, Version 2.0"
-                                       url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                               }
-                       }
-               }
-        }
-    }
-}
+afterEvaluate {
+	publishing {
+	    publications {
+	        mavenJava(MavenPublication) {
 
-signing {
-    useInMemoryPgpKeys(
-            keyId,
-            key,
-            password,
-    )
-    sign publishing.publications.mavenJava
+	               artifact sourcesJar
+	               artifact javadocJar
+		       from project.softwareComponentChoosed
+
+	               pom {
+	                       groupId = "io.github.ReleaseStandard.CodeEditor"
+	                       artifactId = project.name.replace("CodeEditor-", "")
+	                       name = project.name
+	                       packaging = 'aar'
+	                       description = "${project.name} for CodeEditor"
+	                       url = "https://github.com/ReleaseStandard/${project.name}"
+	                       scm {
+	                               connection = "scm:git:github.com/ReleaseStandard/${project.name}.git"
+	                               developerConnection = "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
+	                               url = "https://github.com/ReleaseStandard/${project.name}"
+	                       }
+	                       developers {
+	                               developer {
+	                                       id = "ReleaseStandard"
+	                                       name = "Release Standard"
+	                                       email = "releasestandard@netc.eu"
+	                               }
+	                       }
+	                       licenses {
+	                               license {
+	                                       name = "The Apache License, Version 2.0"
+	                                       url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+	                               }
+	                       }
+	               }
+	        }
+	    }
+	}
+
+
+	signing {
+	    useInMemoryPgpKeys(
+	            keyId,
+	            key,
+	            password,
+	    )
+	    sign publishing.publications.mavenJava
+	}
 }

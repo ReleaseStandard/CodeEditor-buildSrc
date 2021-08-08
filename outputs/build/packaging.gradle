@@ -63,8 +63,10 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 				project.dependencies.embed project(":${p.name}")
 			}
 		}
+		project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.release }
 	}
 
 } else {
-	throw new GradleException("view ${vtype} not found for project ${project.name} aborting")
+	apply plugin: 'java'
+	project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.java }
 }
