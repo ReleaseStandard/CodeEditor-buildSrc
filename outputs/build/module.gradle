@@ -51,6 +51,5 @@ if ( System.env.VIEW_TYPE.equals(vtype) ) {
 	}
 
 } else {
-	apply plugin: 'java-library'
-	println "Need something here : OR get zip OR add sources of the sub to then"
+	println "view not supported by this plugin"
 }
