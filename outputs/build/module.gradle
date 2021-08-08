@@ -2,7 +2,6 @@
 // Used to compile a module from CodeEditor (eg editor)
 //
 buildscript {
-
         ext["buildScriptRepos"] = {
                 google()
                 mavenCentral()
@@ -13,6 +12,7 @@ buildscript {
         ext["buildScriptDep"] = {
                 classpath "com.android.tools.build:gradle:4.2.1"
                 classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
+                classpath 'com.github.kezong:fat-aar:1.3.6'
         }
 
         repositories buildScriptRepos
@@ -21,25 +21,43 @@ buildscript {
 }
 
 //
-// Setup project properties
+// Setup root project
 //
+repositories buildScriptRepos
+apply from: 'buildSrc/outputs/build/build.helper.gradle'
 group = "io.github.ReleaseStandard.CodeEditor"
 if ( version == "unspecified" ) {
         version = '1';
 }
 
 //
-// applying plugins
-//
-apply plugin: 'java'
-apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
-apply from: 'buildSrc/outputs/build/newVersion.gradle'
-
-//
 // Setup subprojects
 //
 subprojects { Project p ->
+
         repositories buildScriptRepos
         def helpers = rootDir.getPath() + "/buildSrc/outputs/build/build.helper.gradle"
         apply from: helpers
+}
+
+//
+// View types currently supported:
+//  - java application
+//  - android application
+//
+def vtype = "android"
+if ( System.env.VIEW_TYPE.equals(vtype) ) {
+
+	apply from: "view-${vtype}/build.gradle"
+	android.sourceSets {
+		main {
+			manifest.srcFile "view-${vtype}/src/main/AndroidManifest.xml"
+		        java.srcDirs = ["view-${vtype}/src/main/java"]
+		        res.srcDirs = ["view-${vtype}/src/main/res"]
+		}
+	}
+
+} else {
+	apply plugin: 'java-library'
+	println "Need something here : OR get zip OR add sources of the sub to then"
 }
