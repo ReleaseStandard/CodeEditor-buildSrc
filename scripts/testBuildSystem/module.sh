@@ -20,21 +20,22 @@ printSuccess "newVersion"
 printSuccess "projects"
 $r && assert "send to MavenCentral" "$(./gradlew assemble && ./gradlew produceBigJar && ./gradlew --stacktrace --info --debug publishToSonatype closeAndReleaseStagingRepository)"
 assert "assemble the project" "$(./gradlew assemble)"
-find -name "*.jar"
 
+# Checking the jar
 ./gradlew produceBigJar
-arch="build/libs/CodeEditor-logger-debug-$(./gradlew version -q).jar"
+arch="build/libs/*-$(./gradlew version -q).jar"
 content=$(unzip -l $arch)
 FILES=($(find -name "*.java"))
 for f in "${FILES[@]}" ; do
 	ffile="${f/*\//}"
 	ffolder="${f/${ffile}/}"
 	fclass="${ffile/.java/}"
-	echo "$content" |grep "$fclass"
+	echo "$content" |grep "$fclass" 2>/dev/null 1>/dev/null
 	if [ "$?" -ne "0" ] ; then printFail "$f not found in the final archive" ; fi
 done
+echo "content=$content"
 printSuccess "produceBigJar"
 
-echo "content=$content"
-#assert "all classes are included" "$(true)"
+# Checking the aar
+
 finit
