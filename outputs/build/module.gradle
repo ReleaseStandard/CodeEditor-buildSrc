@@ -40,8 +40,9 @@ allprojects {
 //
 def vtype = "android"
 if ( System.env.VIEW_TYPE.equals(vtype) ) {
-
+	// ici il faut inclure avec la embed (prise en compte aar + jar)
 	apply from: "view-${vtype}/build.gradle"
+	apply plugin: 'com.kezong.fat-aar'
 	android.sourceSets {
 		main {
 			manifest.srcFile "view-${vtype}/src/main/AndroidManifest.xml"
@@ -49,7 +50,11 @@ if ( System.env.VIEW_TYPE.equals(vtype) ) {
 		        res.srcDirs = ["view-${vtype}/src/main/res"]
 		}
 	}
+	dependencies.embed project(':controller')
+	dependencies.embed project(':editor')
+	dependencies.embed project(':model')
 
 } else {
 	println "view not supported by this plugin"
+	// ici il faut inclure d'une autre manière ex: zip tree
 }
