@@ -23,21 +23,14 @@ buildscript {
 //
 // Setup root project
 //
-repositories buildScriptRepos
-apply from: 'buildSrc/outputs/build/build.helper.gradle'
 group = "io.github.ReleaseStandard.CodeEditor"
 if ( version == "unspecified" ) {
         version = '1';
 }
 
-//
-// Setup subprojects
-//
-subprojects { Project p ->
-
+allprojects {
         repositories buildScriptRepos
-        def helpers = rootDir.getPath() + "/buildSrc/outputs/build/build.helper.gradle"
-        apply from: helpers
+        apply from: "${rootDir.getPath()}/buildSrc/outputs/build/build.helper.gradle"
 }
 
 //
