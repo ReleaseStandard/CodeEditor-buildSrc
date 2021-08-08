@@ -1,71 +1,45 @@
 //
 // Used to compile a module from CodeEditor (eg editor)
 //
-group = "io.github.ReleaseStandard.CodeEditor"
-if ( version == "unspecified" ) {
-        version = '1';
-}
+buildscript {
 
-apply from: 'buildSrc/outputs/build/build.module.gradle'
-apply plugin: 'java'
-apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
-if ( (new File('custom.gradle')).exists() ) {
-	apply from: 'custom.gradle'
-}
-
-
-subprojects { Project p ->
-	version = rootProject.version
-
-        repositories {
+        ext["buildScriptRepos"] = {
                 google()
                 mavenCentral()
                 jcenter() // Warning: this repository is going to shut down soon
                 maven { url = 'https://jitpack.io' }
                 maven { url = 'https://s01.oss.sonatype.org/content/groups/public/' }
         }
+        ext["buildScriptDep"] = {
+                classpath "com.android.tools.build:gradle:4.2.1"
+                classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
+        }
+
+        repositories buildScriptRepos
+        dependencies buildScriptDep
 
 }
 
-buildscript {
-	repositories {
-		google()
-		mavenCentral()
-		jcenter() // Warning: this repository is going to shut down soon
-		maven { url = 'https://jitpack.io' }
-		maven { url = 'https://s01.oss.sonatype.org/content/groups/public/' }
-	}
-	dependencies {
-		classpath "com.android.tools.build:gradle:4.2.1"
-	        classpath 'io.github.gradle-nexus:publish-plugin:1.1.0'
-	}
+//
+// Setup project properties
+//
+group = "io.github.ReleaseStandard.CodeEditor"
+if ( version == "unspecified" ) {
+        version = '1';
 }
 
-task newVersion() {
-	doFirst {
+//
+// applying plugins
+//
+apply plugin: 'java'
+apply from: 'buildSrc/outputs/build/mavenCentralPublish.gradle'
+apply from: 'buildSrc/outputs/build/newVersion.gradle'
 
-		println "[***] New version"
-		def fname = 'gradle.properties'
-		Properties properties = new Properties()
-		properties.load(project.file(fname).newDataInputStream())
-	
-	        version = Integer.parseInt(version) + 1
-		properties.setProperty('version', version.toString())
-		properties.store(new FileWriter(fname, false), '')
-
-	}
-	doLast {
-                exec {
-                        commandLine "git"
-                        args "add","gradle.properties"
-                }
-                exec {
-                        commandLine "git"
-                        args "commit","-m","update version to ${version}"
-                }
-		exec {
-			commandLine "git"
-			args "tag","${version}"
-		}
-	}
+//
+// Setup subprojects
+//
+subprojects { Project p ->
+        repositories buildScriptRepos
+        def helpers = rootDir.getPath() + "/buildSrc/outputs/build/build.helper.gradle"
+        apply from: helpers
 }

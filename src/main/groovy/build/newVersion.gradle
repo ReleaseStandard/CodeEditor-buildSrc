@@ -1,0 +1,36 @@
+//
+// This file define how version number is automatically increase
+//
+task newVersion() {
+        doFirst {
+
+                println "[***] New version"
+                def fname = 'gradle.properties'
+                Properties properties = new Properties()
+                properties.load(project.file(fname).newDataInputStream())
+
+                version = Integer.parseInt(version) + 1
+                properties.setProperty('version', version.toString())
+                properties.store(new FileWriter(fname, false), '')
+
+        }
+        doLast {
+                exec {
+                        commandLine "git"
+                        args "add","gradle.properties"
+                }
+                exec {
+                        commandLine "git"
+                        args "commit","-m","update version to ${version}"
+                }
+                exec {
+                        commandLine "git"
+                        args "tag","${version}"
+                }
+        }
+}
+task version() {
+	doFirst {
+		println "${version}"
+	}
+}
