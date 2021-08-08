@@ -29,3 +29,8 @@ task newVersion() {
                 }
         }
 }
+task version() {
+	doFirst {
+		println "${version}"
+	}
+}
