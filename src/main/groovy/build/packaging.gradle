@@ -1,0 +1,70 @@
+//
+// It is up to the module to support zero or more views (if no view given : a java library is maid)
+//
+def vtype = null
+ext["VIEW_PREFIX"] = "view-"
+import org.apache.tools.ant.DirectoryScanner
+
+// list view supported by this project
+def getSupportedViews() {
+	DirectoryScanner scanner = new DirectoryScanner();
+	String [] patterns = ["${VIEW_PREFIX}*"] as String[];
+	scanner.setIncludes(patterns);
+	scanner.setBasedir(project.projectDir.getPath());
+	scanner.setCaseSensitive(true);
+	scanner.scan();
+	return scanner.dirsIncluded
+}
+// test a given object to see if it represent a view
+def isAview(p) {
+	return ( p.name.contains(VIEW_PREFIX) )
+}
+
+// try to guess view type for this module
+if ( System.env.VIEW_TYPE ) {
+	vtype = System.env.VIEW_TYPE
+} else {
+	String [] files = getSupportedViews()
+	if ( files.length > 1 ) {
+		println "[WARNING] GUESS FAIL: Multiple views found for this project you must specify one to choose from"
+	} else if (files.length == 1) {
+		vtype = files[0]
+	} else {
+		println "[WARNING] GUESS FAIL: No view for this project" // error here
+	}
+}
+vtype=vtype.replaceFirst(VIEW_PREFIX,"")
+
+task listSupportedViews() {
+	doFirst() {
+		println "view supported by this project:"
+		for(String f : getSupportedViews()) {
+			String viewName = f.replace("${VIEW_PREFIX}","")
+			println " - ${viewName}"
+		}
+	}
+}
+
+if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
+
+	if ( vtype.equals("android") ) {
+		def folder = "${VIEW_PREFIX}android"
+		apply from: "${folder}/build.gradle"
+		apply plugin: 'com.kezong.fat-aar'
+		android.sourceSets {
+			main {
+				manifest.srcFile "${folder}/src/main/AndroidManifest.xml"
+			        java.srcDirs = ["${folder}/src/main/java"]
+			        res.srcDirs = ["${folder}/src/main/res"]
+			}
+		}
+		for(Project p : project.subprojects) {
+			if ( ! isAview(p) ) {
+				project.dependencies.embed project(":${p.name}")
+			}
+		}
+	}
+
+} else {
+	throw new GradleException("view ${vtype} not found for project ${project.name} aborting")
+}

@@ -41,7 +41,7 @@ def implementationR(path) {
 	}
 
         dependencies {
-                implementation project(path: p)
+                api project(path: p)
         }
 
 }
@@ -63,9 +63,9 @@ configurations {
 				if ( buildFromLocal instanceof String ) {
 
 				   // tweak remote dependencie resolution
-				   if ( requested.group == "com.github.ReleaseStandard" ) {
+				   if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
 
-					def modPath = ":" + requested.getModule()
+					def modPath = ":CodeEditor-" + requested.getModule()
 					def module = rootProject.findProject(modPath)
 					if ( module == null ) {
 						info("[ERROR] " + modPath + " not found")
@@ -76,6 +76,7 @@ configurations {
 					module.subprojects { Project p ->
 						modCount = modCount + 1
 					}
+/*
 					if ( modCount == 1 ) {
 						info("  -> Module alone : in " + modPath)
 						module.subprojects { Project p ->
@@ -94,8 +95,9 @@ configurations {
 							}
 						}
 					}
+*/
+					dependency.useTarget modePath
                                    }
-
 
 				}
 			}
