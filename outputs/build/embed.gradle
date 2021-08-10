@@ -6,7 +6,7 @@ def universalEmbed(moduleSelector) {
     if ( project.plugins.hasPlugin("com.android.library") ) {
         apply plugin: 'com.kezong.fat-aar'
         fataar {
-            transitive = true
+            transitive = false
         }
         project.dependencies.embed moduleSelector
     } else {
