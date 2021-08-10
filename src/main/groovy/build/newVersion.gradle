@@ -34,3 +34,14 @@ task version() {
 		println "${version}"
 	}
 }
+task versionRelease() {
+	dependsOn assemble
+	doLast {
+		println ""
+		println ""
+		println "Then to publish use:"
+		println "    ./gradlew publishToSonatype closeAndReleaseStagingRepository"
+		println ""
+		println ""
+	}
+}
