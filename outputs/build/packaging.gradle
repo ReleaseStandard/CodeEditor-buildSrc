@@ -61,6 +61,8 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 		android.packagingOptions {
 			exclude "**/module-info.class"
 		}
+		android.defaultConfig.versionCode Integer.parseInt(version)
+		android.defaultConfig.versionName version
 		for(Project p : project.subprojects) {
 			if ( ! isAview(p) ) {
 				universalEmbed project(":${p.name}")
