@@ -3,14 +3,14 @@
 //
 buildscript {
         ext["buildScriptRepos"] = {
+                flatDir {
+                        dirs 'libs'
+                }
                 google()
                 mavenCentral()
                 jcenter() // Warning: this repository is going to shut down soon
                 maven { url = 'https://jitpack.io' }
 	        maven { url = 'https://s01.oss.sonatype.org/content/groups/public/' }
-		flatDir {
-			dirs 'libs'
-		}
         }
         ext["buildScriptDep"] = {
                 classpath "com.android.tools.build:gradle:4.2.1"
@@ -34,6 +34,7 @@ if ( version == "unspecified" ) {
 
 allprojects {
         repositories buildScriptRepos
+        apply from: "${rootDir.getPath()}/buildSrc/outputs/build/embed.gradle"
         apply from: "${rootDir.getPath()}/buildSrc/outputs/build/build.helper.gradle"
 }
 

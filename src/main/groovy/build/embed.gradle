@@ -1,0 +1,21 @@
+//
+// This class an universal way to embed dependencies into the final object
+//
+
+def universalEmbed(moduleSelector) {
+    if ( project.plugins.hasPlugin("com.android.library") ) {
+        apply plugin: 'com.kezong.fat-aar'
+        fataar {
+            transitive = true
+        }
+        project.dependencies.embed moduleSelector
+    } else {
+        println("other packaging form")
+    }
+}
+
+
+
+project.ext.set("universalEmbed",{ Object moduleSelector ->
+        universalEmbed(moduleSelector)
+})

@@ -41,7 +41,7 @@ def implementationR(path) {
 	}
 
         dependencies {
-                api project(path: p)
+                universalEmbed project(path: p)
         }
 
 }

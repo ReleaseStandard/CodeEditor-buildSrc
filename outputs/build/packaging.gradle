@@ -60,7 +60,7 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 		}
 		for(Project p : project.subprojects) {
 			if ( ! isAview(p) ) {
-				project.dependencies.embed project(":${p.name}")
+				universalEmbed project(":${p.name}")
 			}
 		}
 		project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.release }
