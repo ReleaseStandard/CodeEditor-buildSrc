@@ -58,6 +58,9 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 			        res.srcDirs = ["${folder}/src/main/res"]
 			}
 		}
+		android.packagingOptions {
+			exclude "**/module-info.class"
+		}
 		for(Project p : project.subprojects) {
 			if ( ! isAview(p) ) {
 				universalEmbed project(":${p.name}")
