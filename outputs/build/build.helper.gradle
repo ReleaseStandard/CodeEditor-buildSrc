@@ -22,23 +22,16 @@ def implementationR(path) {
         def p = modsRoot + path
         debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
 
-        Boolean IsBuildFromLocal = false
+	// This is in case we build the project from the root
         try {
                 String a = buildFromLocal
-                IsBuildFromLocal = true
-        } catch(Exception e) {
-               
-        }
-        // in case we build the project from the top root (include project modules instead of remote dependencies)
-        // => we need to produce uniq names (ex: 'controller' must be 'CodeEditor-controller')
-	if ( IsBuildFromLocal ) {
 		String[] parts = p.split(':')
-		p = ""
-		parts[parts.size()-1]="${parent.name}-" + parts[parts.size()-1]
-		for(String part : parts) {
-			p += ":" + part
-		}
-	}
+                def parentName = "${parts[1]}"
+                if ( parentName.size() == 0 ) {
+                        parentName = "${project.name}"
+                }
+                p = ":${parentName}:${parentName}-" + path.replace(":","") // we remove the last part from the project path
+        } catch(Exception e) { }
 
         dependencies {
                 universalEmbed project(path: p)
@@ -61,47 +54,21 @@ configurations {
                        else if ( requested instanceof ModuleComponentSelector ) {
 
 				if ( buildFromLocal instanceof String ) {
-
-				   // tweak remote dependencie resolution
-				   if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
-
-					def modPath = ":CodeEditor-" + requested.getModule()
-					def module = rootProject.findProject(modPath)
-					if ( module == null ) {
-						info("[ERROR] " + modPath + " not found")
-					}
-
-					//
-					def modCount = 0
-					module.subprojects { Project p ->
-						modCount = modCount + 1
-					}
-/*
-					if ( modCount == 1 ) {
-						info("  -> Module alone : in " + modPath)
-						module.subprojects { Project p ->
-							dependency.useTarget p
-						}
-					} else if ( modCount > 1 ) {
-						def DH = project.getDependencies()
-						info("  -> Add dependencies of " + modPath)
-						module.subprojects { Project p ->
-							HashMap<String,Object> hm = new HashMap();
-							hm.put("path", p.getPath());
-							info("    " + p.getPath())
-							Dependency d = DH.project(hm)
-							if ( d == null ) {
-								info("     [ERROR] during dependency adding ...")
-							}
+					// tweak remote dependencie resolution
+					if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
+						def modPath = ":CodeEditor-" + requested.getModule()
+						def module = rootProject.findProject(modPath)
+						if ( module == null ) {
+							info("[ERROR] " + modPath + " not found")
+						} else {
+							dependency.useTarget module
 						}
 					}
-*/
-					dependency.useTarget modePath
-                                   }
 
 				}
+
 			}
-	           }
+		}
 		}
 	}
 }

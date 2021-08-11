@@ -46,8 +46,9 @@ task listSupportedViews() {
 }
 
 def javaVersion = JavaVersion.VERSION_1_8
-if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
-
+def viewFile = "${project.projectDir.getPath()}/${VIEW_PREFIX}${vtype}"
+if ( (new File(viewFile)).exists() ) {
+	println "selected view exists"
 	if ( vtype.equals("android") ) {
 		def folder = "${VIEW_PREFIX}android"
 		apply from: "${folder}/build.gradle"
@@ -69,8 +70,14 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 		android.defaultConfig.versionCode Integer.parseInt(version)
 		android.defaultConfig.versionName version
 		for(Project p : project.subprojects) {
+			def pname = "${p.name}"
+			try {
+				if (buildFromLocal instanceof String) {
+					pname = "${project.path}:${p.name}"
+				}
+			} catch (Exception e) {}
 			if ( ! isAview(p) ) {
-				universalEmbed project(":${p.name}")
+				universalEmbed project(pname)
 			}
 		}
 		java {

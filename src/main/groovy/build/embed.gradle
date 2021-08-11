@@ -3,12 +3,22 @@
 //
 
 def universalEmbed(moduleSelector) {
+
     if ( project.plugins.hasPlugin("com.android.library") ) {
         apply plugin: 'com.kezong.fat-aar'
         fataar {
             transitive = true
         }
-        project.dependencies.embed moduleSelector
+	if ( moduleSelector instanceof Project ) {
+		if ( moduleSelector.plugins.hasPlugin("com.android.library") ) {
+			project.dependencies.embed moduleSelector
+		} else {
+			println "${moduleSelector.path} do not have the android plugin applyed"
+			project.dependencies.implementation moduleSelector
+		}
+	} else {
+                project.dependencies.embed moduleSelector
+	}
     } else {
         println("other packaging form")
     }
