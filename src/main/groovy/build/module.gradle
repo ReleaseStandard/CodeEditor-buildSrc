@@ -40,10 +40,10 @@ def usePlugin(project, plugin) {
 		project.apply from: "https://raw.githubusercontent.com/${githubOwner}/CodeEditor-buildSrc/master/outputs/build/${plugin}"
 	}
 }
-allprojects {
+allprojects { Project p ->
         repositories buildScriptRepos
-	usePlugin(this, "embed.gradle")
-	usePlugin(this, "build.helper.gradle")
+	usePlugin(p, "embed.gradle")
+	usePlugin(p, "build.helper.gradle")
 }
 
 usePlugin(project, "packaging.gradle")
