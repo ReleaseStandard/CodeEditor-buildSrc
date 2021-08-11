@@ -45,6 +45,7 @@ task listSupportedViews() {
 	}
 }
 
+def javaVersion = JavaVersion.VERSION_1_8
 if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 
 	if ( vtype.equals("android") ) {
@@ -61,10 +62,18 @@ if ( (new File("${VIEW_PREFIX}${vtype}")).exists() ) {
 		android.packagingOptions {
 			exclude "**/module-info.class"
 		}
+		android.compileOptions {
+                        sourceCompatibility javaVersion
+                        targetCompatibility javaVersion
+		}
 		for(Project p : project.subprojects) {
 			if ( ! isAview(p) ) {
 				universalEmbed project(":${p.name}")
 			}
+		}
+		java {
+			sourceCompatibility = javaVersion
+			targetCompatibility = javaVersion
 		}
 		project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.release }
 	}
