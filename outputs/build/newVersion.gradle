@@ -21,7 +21,7 @@ task newVersion() {
                 }
                 exec {
                         commandLine "git"
-                        args "commit","-m","update version to ${version}"
+                        args "commit","--amend","--no-edit"
                 }
                 exec {
                         commandLine "git"
