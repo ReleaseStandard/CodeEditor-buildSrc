@@ -5,6 +5,9 @@ def Properties properties = new Properties()
 if ( (new File('local.properties')).exists() ) {
 	properties.load(project.file("local.properties").newDataInputStream())
 }
+ext['githubOwner'] = "ReleaseStandard"
+ext['githubOwnerEmail'] = "releasestandard@netc.eu"
+ext['githubOwnerName'] = "Release Standard"
 for(Map.Entry<String, String> e : new HashMap(){{
 	put("keyId", "KEYID");
 	put("password", "PASSWORD");
@@ -27,16 +30,6 @@ for(Map.Entry<String, String> e : new HashMap(){{
         }
 }
 
-task collectSubModules() {
-	doFirst() {
-		project.subprojects { Project p ->
-			apply plugin: 'maven'
-			apply plugin: 'maven-publish'
-			apply plugin: 'signing'
-		}
-	}
-}
-
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
     //from javadoc
@@ -50,7 +43,6 @@ task sourcesJar(type: Jar) {
 //
 // Maven publish customization and publish
 //
-apply plugin: 'maven-publish'
 def isRoot = ( rootProject.compareTo(project) == 0 ) 
 if ( isRoot ) {
 	apply plugin: 'io.github.gradle-nexus.publish-plugin'
@@ -67,53 +59,71 @@ if ( isRoot ) {
 	        }
 	}
 }
+apply plugin: 'maven-publish'
 
-afterEvaluate {
-	publishing {
-	    publications {
-	        mavenJava(MavenPublication) {
+def thisProject = project
+allprojects { Project p -> 
+	p.afterEvaluate {
+		def pubname = "${p.path}".replaceAll(":","")
+		pubname = pubname.replaceAll("-","")
+		pubname = "Module" + pubname.capitalize()
+		publishing {
+			publications {
+				"${pubname}"(MavenPublication) {
+					artifact sourcesJar
+					artifact javadocJar
 
-	               artifact sourcesJar
-	               artifact javadocJar
-		       from project.softwareComponentChoosed
+					if ( p.plugins.hasPlugin('com.android.library') ) {
+						p.afterEvaluate {
+							from p.components.release
+						}
+					} else {
+						p.afterEvaluate {
+							from p.components.java
+						}
+					}
 
-	               pom {
-	                       groupId = "io.github.ReleaseStandard.CodeEditor"
-	                       artifactId = project.name.replace("CodeEditor-", "")
-	                       name = project.name
-	                       packaging = 'aar'
-	                       description = "${project.name} for CodeEditor"
-	                       url = "https://github.com/ReleaseStandard/${project.name}"
-	                       scm {
-	                               connection = "scm:git:github.com/ReleaseStandard/${project.name}.git"
-	                               developerConnection = "scm:git:ssh://github.com/ReleaseStandard/${project.name}.git"
-	                               url = "https://github.com/ReleaseStandard/${project.name}"
-	                       }
-	                       developers {
-	                               developer {
-	                                       id = "ReleaseStandard"
-	                                       name = "Release Standard"
-	                                       email = "releasestandard@netc.eu"
-	                               }
-	                       }
-	                       licenses {
-	                               license {
-	                                       name = "The Apache License, Version 2.0"
-	                                       url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-	                               }
-	                       }
-	               }
-	        }
-	    }
-	}
-
-
-	signing {
-	    useInMemoryPgpKeys(
-	            keyId,
-	            key,
-	            password,
-	    )
-	    sign publishing.publications.mavenJava
+					def artifactGroup = "io.github.${githubOwner}.CodeEditor"
+					if ( thisProject != p ) {
+						artifactGroup += ".${thisProject.name.replace('CodeEditor-', '')}"
+					}
+					def pname = p.name.replace("CodeEditor-","")
+					pom {
+						groupId = artifactGroup
+						artifactId = pname
+						name = pname
+						packaging = 'aar'
+						description = "${pname} for CodeEditor"
+						url = "https://github.com/${githubOwner}/${p.name}"
+						scm {
+						       connection = "scm:git:github.com/${githubOwner}/${p.name}.git"
+						       developerConnection = "scm:git:ssh://github.com/${githubOwner}/${p.name}.git"
+						       url = "https://github.com/${githubOwner}/${p.name}"
+						}
+						developers {
+						       developer {
+						               id = "${githubOwner}"
+						               name = "${githubOwnerName}"
+						               email = "${githubOwnerEmail}"
+						       }
+						}
+						licenses {
+						       license {
+						               name = "The Apache License, Version 2.0"
+						               url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						       }
+						}
+					}
+				}
+			}
+			signing {
+			        useInMemoryPgpKeys(
+			                keyId,
+		        	        key,
+		                	password,
+			        )
+			        sign publishing.publications."${pubname}"
+			}
+		}
 	}
 }
