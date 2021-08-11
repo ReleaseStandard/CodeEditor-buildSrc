@@ -27,17 +27,26 @@ buildscript {
 //
 // Setup root project
 //
-group = "io.github.ReleaseStandard.CodeEditor"
+ext['githubOwner'] = "ReleaseStandard"
+group = "io.github.${githubOwner}.CodeEditor"
 if ( version == "unspecified" ) {
         version = '1';
 }
 
+def usePlugin(project, plugin) {
+	if ( System.env.USE_LOCAL_BUILDSRC ) {
+                project.apply from: "${rootDir.getPath()}/buildSrc/outputs/build/${plugin}"
+	} else {
+		project.apply from: "https://raw.githubusercontent.com/${githubOwner}/CodeEditor-buildSrc/master/outputs/build/${plugin}"
+	}
+}
 allprojects {
         repositories buildScriptRepos
-        apply from: "${rootDir.getPath()}/buildSrc/outputs/build/embed.gradle"
-        apply from: "${rootDir.getPath()}/buildSrc/outputs/build/build.helper.gradle"
+	usePlugin(this, "embed.gradle")
+	usePlugin(this, "build.helper.gradle")
 }
 
-apply from: "${rootDir.getPath()}/buildSrc/outputs/build/packaging.gradle"
-apply from: "${rootDir.getPath()}/buildSrc/outputs/build/newVersion.gradle"
-apply from: "${rootDir.getPath()}/buildSrc/outputs/build/mavenCentralPublish.gradle"
+usePlugin(project, "packaging.gradle")
+usePlugin(project, "newVersion.gradle")
+usePlugin(project, "mavenCentralPublish.gradle")
+
