@@ -15,7 +15,6 @@ for(Map.Entry<String, String> e : new HashMap(){{
 	put("ossrhUsername", "OSSRH_USERNAME");
 	put("ossrhPassword", "OSSRH_PASSWORD");
 	put("sonatypeStagingProfileId", "SONATYPE_STAGING_PROFILE_ID");
-	put("version", "VERSION");
 }}) {
 	String k = e.getKey();
 	String v = e.getValue();

@@ -9,16 +9,7 @@ def universalEmbed(moduleSelector) {
         fataar {
             transitive = true
         }
-	if ( moduleSelector instanceof Project ) {
-		if ( moduleSelector.plugins.hasPlugin("com.android.library") ) {
-			project.dependencies.embed moduleSelector
-		} else {
-			println "${moduleSelector.path} do not have the android plugin applyed"
-			project.dependencies.implementation moduleSelector
-		}
-	} else {
-                project.dependencies.embed moduleSelector
-	}
+		project.dependencies.embed moduleSelector	
     } else {
         println("other packaging form")
     }

@@ -44,11 +44,9 @@ task listSupportedViews() {
 		}
 	}
 }
-
 def javaVersion = JavaVersion.VERSION_1_8
 def viewFile = "${project.projectDir.getPath()}/${VIEW_PREFIX}${vtype}"
 if ( (new File(viewFile)).exists() ) {
-	println "selected view exists"
 	if ( vtype.equals("android") ) {
 		def folder = "${VIEW_PREFIX}android"
 		apply from: "${folder}/build.gradle"
@@ -67,8 +65,8 @@ if ( (new File(viewFile)).exists() ) {
                         sourceCompatibility javaVersion
                         targetCompatibility javaVersion
 		}
-		android.defaultConfig.versionCode Integer.parseInt(version)
-		android.defaultConfig.versionName version
+		android.defaultConfig.versionCode semver.minor
+		android.defaultConfig.versionName "${version}"
 		for(Project p : project.subprojects) {
 			def pname = "${p.name}"
 			try {
