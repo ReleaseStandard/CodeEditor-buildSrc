@@ -116,13 +116,20 @@ allprojects { Project p ->
 					}
 				}
 			}
-			signing {
+			p.signing {
 			        useInMemoryPgpKeys(
 			                keyId,
 		        	        key,
 		                	password,
 			        )
-			        sign publishing.publications."${pubname}"
+			        sign p.publishing.publications."${pubname}"
+			}
+			def t = thisProject.tasks.getByName("sign${pubname}Publication")
+			afterEvaluate {
+				try {
+					Task ta = p.tasks.getByName("reBundleAarRelease")
+					ta.finalizedBy t
+				} catch(Exception e) {}
 			}
 		}
 	}
