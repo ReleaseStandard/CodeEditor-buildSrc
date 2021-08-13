@@ -8,23 +8,13 @@ rootDir.eachDirRecurse { dir ->
   }
 }
 
-
 def makeInclude(dir) {
 
-  // deduce the remaining part
-  def remainPart = ""
-  def projectDirectory = dir
-  def rootProjectDirectory = rootDir.getPath()
-  if ( dir instanceof File ) {
-      projectDirectory = dir.getPath()
-  }
-  remainPart = projectDirectory.replace(rootProjectDirectory,"")
-  remainPart = remainPart.replaceAll("/",":")
-
+  def remainPart = getRemainingPart(dir)
   if ( System.env.DEBUG ) {
-    println "remainPart=${remainPart}, projectDirectory=${projectDirectory}"
+    println "remainPart=${remainPart}"
   }
   include("${remainPart}")
-  project("${remainPart}").projectDir = file(projectDirectory)
+  project("${remainPart}").projectDir = file(getProjectPath(dir))
 
 }

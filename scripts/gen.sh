@@ -48,3 +48,4 @@ apply2 ""
 apply3 lib common root
 
 cp -r "${g}/build/" "$O"
+cp "${Isettings}/lib.gradle" "$O"

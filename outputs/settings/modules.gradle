@@ -8,7 +8,25 @@ def p(msg) {
 		println msg
 	}
 }
-// src/main/groovy//settings//common.gradle
+
+// deduce the remaining part from an entry object
+def getRemainingPart(dir) {
+  def remainPart = ""
+  def projectDirectory = getProjectPath(dir)
+  def rootProjectDirectory = rootDir.getPath()
+  remainPart = projectDirectory.replace(rootProjectDirectory,"")
+  remainPart = remainPart.replaceAll("/",":")
+  return remainPart
+}
+def getProjectPath(obj) {
+  if ( obj instanceof Project ) {
+    return obj.projectDir.getPath()
+  }
+  if ( obj instanceof File ) {
+      return obj.getPath()
+  }
+  return obj	
+}// src/main/groovy//settings//common.gradle
 rootDir.eachDirRecurse { dir ->
   if ( ! ( dir.name.equals("buildSrc") ) 
   && new File(dir, 'build.gradle').exists()
@@ -19,24 +37,14 @@ rootDir.eachDirRecurse { dir ->
   }
 }
 
-
 def makeInclude(dir) {
 
-  // deduce the remaining part
-  def remainPart = ""
-  def projectDirectory = dir
-  def rootProjectDirectory = rootDir.getPath()
-  if ( dir instanceof File ) {
-      projectDirectory = dir.getPath()
-  }
-  remainPart = projectDirectory.replace(rootProjectDirectory,"")
-  remainPart = remainPart.replaceAll("/",":")
-
+  def remainPart = getRemainingPart(dir)
   if ( System.env.DEBUG ) {
-    println "remainPart=${remainPart}, projectDirectory=${projectDirectory}"
+    println "remainPart=${remainPart}"
   }
   include("${remainPart}")
-  project("${remainPart}").projectDir = file(projectDirectory)
+  project("${remainPart}").projectDir = file(getProjectPath(dir))
 
 }// src/main/groovy//settings//modules.gradle
 /**
