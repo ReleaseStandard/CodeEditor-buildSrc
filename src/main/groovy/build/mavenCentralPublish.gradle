@@ -67,6 +67,19 @@ def listTasksOfProject(p) {
 def getPublicationTaskName(module) {
 	return "sign${module}Publication"
 }
+def producePublicationTaskName(obj) {
+	def path = obj
+	if ( obj instanceof Project ) {
+		path = obj.getPath()
+	}
+	def result = ""
+	for(String p1 : path.split(":")) {
+		for(String p2 : p1.split("-")) {
+			result += p2.capitalize()
+		}
+	}
+	return result
+}
 apply plugin: 'maven-publish'
 allprojects { Project p -> 
 	p.afterEvaluate {
@@ -77,9 +90,7 @@ allprojects { Project p ->
 			println "thisProject=${thisProject.name},p=${p.name}"
 		}
 
-		def pubname = "${p.path}".replaceFirst(":","").replaceAll(":","-")
-		//pubname = pubname.replaceAll("-","")
-		pubname = "Module" + pubname.capitalize()
+		def pubname = producePublicationTaskName(p)
 		try {
 			p.tasks.getByName(getPublicationTaskName("${pubname}"))
 			println "task " + getPublicationTaskName("${pubname}") + " found for the project ${thisProject.name}"
