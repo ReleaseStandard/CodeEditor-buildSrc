@@ -47,5 +47,14 @@ apply2 "// root project of CodeEditor have common parts with modules so we manag
 apply2 ""
 apply3 lib common root
 
-cp -r "${g}/build/" "$O"
-cp "${Isettings}/lib.gradle" "$O"
+for f in $(ls ${g}/build/*) ; do
+	file="${f/*\//}"
+	cp "${Isettings}/lib.gradle" "$Obuild/$file"
+	echo "" >> "${Obuild}/$file"
+	cat "$f" >> "$Obuild/$file"
+done
+
+
+
+
+

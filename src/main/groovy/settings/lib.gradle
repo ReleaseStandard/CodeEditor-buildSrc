@@ -14,6 +14,7 @@ def getRemainingPart(dir) {
   remainPart = remainPart.replaceAll("/",":")
   return remainPart
 }
+
 def getProjectPath(obj) {
   if ( obj instanceof Project ) {
     return obj.projectDir.getPath()
@@ -23,3 +24,5 @@ def getProjectPath(obj) {
   }
   return obj	
 }
+
+

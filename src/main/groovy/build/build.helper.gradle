@@ -13,31 +13,42 @@ info("Script inclusion")
 /**
  * Relative include for subprojects
  */
-def implementationR(path) {
-        def parent = project.getParent()
-        def modsRoot = ""
-        if ( parent != null ) {
-                modsRoot = parent.getPath()
+def resolveRelativePath(path) {
+	def remainPart = getRemainingPart(project)
+        String[] parts = remainPart.split(":")
+        String finalPath = ""
+        for(int a = 0; a < parts.length-1; a=a+1) {
+        	if(parts[a].size() > 0 ) {
+        		finalPath += ":" + parts[a]
+        	}
         }
-        def p = modsRoot + path
-        debug("modsRoot=" + modsRoot + ", path=" + path + ",p=" + p)
-
-	// This is in case we build the project from the root
-        try {
-                String a = buildFromLocal
-		String[] parts = p.split(':')
-                def parentName = "${parts[1]}"
-                if ( parentName.size() == 0 ) {
-                        parentName = "${project.name}"
-                }
-                p = ":${parentName}:${parentName}-" + path.replace(":","") // we remove the last part from the project path
-        } catch(Exception e) { }
-
-        dependencies {
-                universalEmbed project(path: p)
+        finalPath += path
+	def p = project.findProject(finalPath)
+	if ( p != null ) {
+        	if ( System.env.DEBUG ) { println "resolveRelativePath: finalPath=${finalPath},remainPart=${remainPart},path=${path}" }
+        	return finalPath
+        } else {
+	        String alternativePath = remainPart + path
+        	p = project.findProject(alternativePath)
+        	if ( p != null ) {
+	        	if ( System.env.DEBUG ) { println "resolveRelativePath: alternativePath=${alternativePath},path=${path}" }
+	        	return alternativePath
+        	}
         }
-
+        println "[WARNING] : path resolution has failed"
+        return null
 }
+def implementationR(path) {
+
+        def finalPath = resolveRelativePath(path)
+        if ( System.env.DEBUG ) {
+        	println "implementationR : finalPath=${finalPath}"
+        }
+        dependencies {
+                universalEmbed project(path: finalPath)
+        }
+}
+
 
 project.ext.set("implementationR",{ String path ->
         implementationR(path)

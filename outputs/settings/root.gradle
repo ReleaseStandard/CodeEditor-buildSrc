@@ -17,6 +17,7 @@ def getRemainingPart(dir) {
   remainPart = remainPart.replaceAll("/",":")
   return remainPart
 }
+
 def getProjectPath(obj) {
   if ( obj instanceof Project ) {
     return obj.projectDir.getPath()
@@ -25,7 +26,10 @@ def getProjectPath(obj) {
       return obj.getPath()
   }
   return obj	
-}// src/main/groovy//settings//common.gradle
+}
+
+
+// src/main/groovy//settings//common.gradle
 rootDir.eachDirRecurse { dir ->
   if ( ! ( dir.name.equals("buildSrc") ) 
   && new File(dir, 'build.gradle').exists()
@@ -45,7 +49,9 @@ def makeInclude(dir) {
   include("${remainPart}")
   project("${remainPart}").projectDir = file(getProjectPath(dir))
 
-}// src/main/groovy//settings//root.gradle
+}
+
+// src/main/groovy//settings//root.gradle
 /**
  * 
  * This script define configuration for the root

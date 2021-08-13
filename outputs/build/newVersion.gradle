@@ -1,3 +1,32 @@
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+	}
+}
+
+// deduce the remaining part from an entry object
+def getRemainingPart(dir) {
+  def remainPart = ""
+  def projectDirectory = getProjectPath(dir)
+  def rootProjectDirectory = rootDir.getPath()
+  remainPart = projectDirectory.replace(rootProjectDirectory,"")
+  remainPart = remainPart.replaceAll("/",":")
+  return remainPart
+}
+
+def getProjectPath(obj) {
+  if ( obj instanceof Project ) {
+    return obj.projectDir.getPath()
+  }
+  if ( obj instanceof File ) {
+      return obj.getPath()
+  }
+  return obj	
+}
+
+
+
 //
 // This file define how version number is automatically increase
 //

@@ -18,3 +18,4 @@ def makeInclude(dir) {
   project("${remainPart}").projectDir = file(getProjectPath(dir))
 
 }
+
