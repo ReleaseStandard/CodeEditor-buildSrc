@@ -55,15 +55,19 @@ configurations {
 
 				if ( buildFromLocal instanceof String ) {
 					// tweak remote dependencie resolution
-					if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
+					/*if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
+
+						println ">>>Dependency resolution"
 						def modPath = ":CodeEditor-" + requested.getModule()
 						def module = rootProject.findProject(modPath)
 						if ( module == null ) {
+							println "error : ${modPath} not found"
 							info("[ERROR] " + modPath + " not found")
 						} else {
+							println "module=${module}"
 							dependency.useTarget module
 						}
-					}
+					}*/
 
 				}
 

@@ -5,9 +5,4 @@
  *
  */
 
-def makeInclude(pname, dir) {
-	include("${pname}")
-        project("${pname}").projectDir = file(dir.getPath())
-}
-
 p "Loaded (rootDir="+rootDir+") ..."

@@ -10,34 +10,40 @@ def p(msg) {
 }
 // src/main/groovy//settings//common.gradle
 rootDir.eachDirRecurse { dir ->
-  if ( ! ( dir.name.equals("buildSrc") )
-	&& new File(dir, 'build.gradle').exists()
+  if ( ! ( dir.name.equals("buildSrc") ) 
+  && new File(dir, 'build.gradle').exists()
   ) {
     if ( ! rootDir.equals(dir.getPath()) ) {
-	    def pname = dir.getPath().replace(rootProject.getProjectDir().getPath(),"")
-	    pname=pname.replaceAll("/",":")
-	    p "pname=${pname}"
-
-            makeInclude(pname, dir)
+      makeInclude(dir)
     }
   }
 }
 
-// REQUIREMENTS:
-//
-//  - You must define makeInclude in particular implementations
-//
-// src/main/groovy//settings//modules.gradle
+
+def makeInclude(dir) {
+
+  // deduce the remaining part
+  def remainPart = ""
+  def projectDirectory = dir
+  def rootProjectDirectory = rootDir.getPath()
+  if ( dir instanceof File ) {
+      projectDirectory = dir.getPath()
+  }
+  remainPart = projectDirectory.replace(rootProjectDirectory,"")
+  remainPart = remainPart.replaceAll("/",":")
+
+  if ( System.env.DEBUG ) {
+    println "remainPart=${remainPart}, projectDirectory=${projectDirectory}"
+  }
+  include("${remainPart}")
+  project("${remainPart}").projectDir = file(projectDirectory)
+
+}// src/main/groovy//settings//modules.gradle
 /**
  *
  * This script provide allow complication of plugins in their own tree
  *
  *
  */
-
-def makeInclude(pname, dir) {
-	include("${pname}")
-        project("${pname}").projectDir = file(dir.getPath())
-}
 
 p "Loaded (rootDir="+rootDir+") ..."

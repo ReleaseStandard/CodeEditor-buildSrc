@@ -58,77 +58,109 @@ if ( isRoot ) {
 	        }
 	}
 }
-apply plugin: 'maven-publish'
 
 def thisProject = project
+
+def listTasksOfProject(p) {
+	for(Task t : p.tasks) { print "${t.name} " }
+}
+def getPublicationTaskName(module) {
+	return "sign${module}Publication"
+}
+apply plugin: 'maven-publish'
 allprojects { Project p -> 
 	p.afterEvaluate {
-		def pubname = "${p.path}".replaceAll(":","")
-		pubname = pubname.replaceAll("-","")
+		if ( System.env.DEBUG ) {
+			println ""
+			println ""
+			println "****************************************************"
+			println "thisProject=${thisProject.name},p=${p.name}"
+		}
+
+		def pubname = "${p.path}".replaceFirst(":","").replaceAll(":","-")
+		//pubname = pubname.replaceAll("-","")
 		pubname = "Module" + pubname.capitalize()
-		publishing {
-			publications {
-				"${pubname}"(MavenPublication) {
-					artifact sourcesJar
-					artifact javadocJar
+		try {
+			p.tasks.getByName(getPublicationTaskName("${pubname}"))
+			println "task " + getPublicationTaskName("${pubname}") + " found for the project ${thisProject.name}"
+		} catch (Exception exception) {
+			thisProject.publishing {
+				publications {
+					"${pubname}"(MavenPublication) {
+						artifact sourcesJar
+						artifact javadocJar
 
-					if ( p.plugins.hasPlugin('com.android.library') ) {
-						p.afterEvaluate {
-							from p.components.release
+						if ( p.plugins.hasPlugin('com.android.library') ) {
+							p.afterEvaluate {
+								from p.components.release
+							}
+						} else if ( p.plugins.hasPlugin('java') || p.plugins.hasPlugin('java-library') ) {
+							p.afterEvaluate {
+								from p.components.java
+							}
+						} else {
+							println "[ERROR] Publication to MavenCentral impossible for project \"${p.name}\""
 						}
-					} else {
-						p.afterEvaluate {
-							from p.components.java
-						}
-					}
 
-					def artifactGroup = "io.github.${githubOwner}.CodeEditor"
-					if ( thisProject != p ) {
-						artifactGroup += ".${thisProject.name.replace('CodeEditor-', '')}"
-					}
-					def pname = p.name.replace("CodeEditor-","")
-					pom {
-						groupId = artifactGroup
-						artifactId = pname
-						name = pname
-						packaging = 'aar'
-						description = "${pname} for CodeEditor"
-						url = "https://github.com/${githubOwner}/${p.name}"
-						scm {
-						       connection = "scm:git:github.com/${githubOwner}/${p.name}.git"
-						       developerConnection = "scm:git:ssh://github.com/${githubOwner}/${p.name}.git"
-						       url = "https://github.com/${githubOwner}/${p.name}"
+						def artifactGroup = "io.github.${githubOwner}.CodeEditor"
+						if ( thisProject != p ) {
+							artifactGroup += ".${thisProject.name.replace('CodeEditor-', '')}"
 						}
-						developers {
-						       developer {
-						               id = "${githubOwner}"
-						               name = "${githubOwnerName}"
-						               email = "${githubOwnerEmail}"
-						       }
-						}
-						licenses {
-						       license {
-						               name = "The Apache License, Version 2.0"
-						               url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-						       }
+						def pname = p.name.replace("CodeEditor-","")
+						pom {
+							groupId = artifactGroup
+							artifactId = pname
+							name = pname
+							packaging = 'aar'
+							description = "${pname} for CodeEditor"
+							url = "https://github.com/${githubOwner}/${p.name}"
+							scm {
+							       connection = "scm:git:github.com/${githubOwner}/${p.name}.git"
+							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/${p.name}.git"
+							       url = "https://github.com/${githubOwner}/${p.name}"
+							}
+							developers {
+							       developer {
+							               id = "${githubOwner}"
+							               name = "${githubOwnerName}"
+							               email = "${githubOwnerEmail}"
+							       }
+							}
+							licenses {
+							       license {
+							               name = "The Apache License, Version 2.0"
+							               url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+							       }
+							}
 						}
 					}
 				}
-			}
-			p.signing {
-			        useInMemoryPgpKeys(
-			                keyId,
-		        	        key,
-		                	password,
-			        )
-			        sign p.publishing.publications."${pubname}"
-			}
-			def t = thisProject.tasks.getByName("sign${pubname}Publication")
-			afterEvaluate {
+				thisProject.signing {
+				        useInMemoryPgpKeys(
+				                keyId,
+			        	        key,
+			                	password,
+				        )
+				        sign thisProject.publishing.publications."${pubname}"
+				}
+				if ( System.env.DEBUG ) {
+					println ""
+					println "thisProject {"
+					listTasksOfProject(thisProject)
+					println "}"
+					println "p {"
+					listTasksOfProject(p)
+					println "}"
+				}
 				try {
-					Task ta = p.tasks.getByName("reBundleAarRelease")
-					ta.finalizedBy t
-				} catch(Exception e) {}
+					def t = thisProject.tasks.getByName(getPublicationTaskName("${pubname}"))
+					afterEvaluate {
+						try {
+							Task ta = thisProject.tasks.getByName("reBundleAarRelease")
+							ta.finalizedBy t
+						} catch(Exception e) {}
+					}
+				} catch(Exception e) { println "[WARNING] could not provide signature for ${p.name}" }
 			}
 		}
 	}
