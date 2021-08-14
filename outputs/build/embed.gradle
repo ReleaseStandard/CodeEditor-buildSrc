@@ -25,7 +25,19 @@ def getProjectPath(obj) {
   return obj	
 }
 
-
+// produce project path from the moduleString
+def moduleToProject(moduleString) {
+  println "entry=" + moduleString
+  def trgGroup = "io.github.ReleaseStandard.CodeEditor"
+  def parts = moduleString.split(":")
+  def group = parts[0]
+  def module = parts[1]
+  def version = parts[2]
+  def remainPart = group.replace(trgGroup,"")
+  remainPart = remainPart.replace(".",":")
+  def path = remainPart + ":${module}"
+  return path
+}
 
 //
 // This class an universal way to embed dependencies into the final object
@@ -33,14 +45,33 @@ def getProjectPath(obj) {
 
 def universalEmbed(moduleSelector) {
 
+    def resolvedSelector = moduleSelector
+    if ( moduleSelector instanceof ProjectDependency ) {
+        resolvedSelector = moduleSelector.getDependencyProject()
+    }
+    if ( moduleSelector instanceof String ) {
+        resolvedSelector = rootProject.findProject(moduleToProject(moduleSelector))
+    }
+    if ( System.env.DEBUG ) {
+        println "moduleSelector=${moduleSelector},resolvedSelector=${resolvedSelector}"
+        for(Configuration c : resolvedSelector.configurations) {
+            println "c=${c.getDisplayName()}"
+        }
+    }
+
+    def selector = moduleSelector
+    if ( buildFromLocal instanceof String ) {
+        selector = resolvedSelector
+    }
+
     if ( project.plugins.hasPlugin("com.android.library") ) {
         apply plugin: 'com.kezong.fat-aar'
         fataar {
             transitive = true
         }
-		project.dependencies.embed moduleSelector	
+        project.dependencies.embed selector
     } else {
-        println("other packaging form")
+        project.dependencies.implementation selector
     }
 }
 

@@ -25,7 +25,19 @@ def getProjectPath(obj) {
   return obj	
 }
 
-
+// produce project path from the moduleString
+def moduleToProject(moduleString) {
+  println "entry=" + moduleString
+  def trgGroup = "io.github.ReleaseStandard.CodeEditor"
+  def parts = moduleString.split(":")
+  def group = parts[0]
+  def module = parts[1]
+  def version = parts[2]
+  def remainPart = group.replace(trgGroup,"")
+  remainPart = remainPart.replace(".",":")
+  def path = remainPart + ":${module}"
+  return path
+}
 
 def prefix(msg) {
 	return "[TEST]" + msg
@@ -83,36 +95,28 @@ project.ext.set("implementationR",{ String path ->
         implementationR(path)
 })
 
+
 configurations {
 	all {
 		resolutionStrategy {
-	           dependencySubstitution.all { DependencySubstitution dependency ->
+			dependencySubstitution.all { DependencySubstitution dependency ->
+       if ( requested instanceof ProjectComponentSelector ) {
+         info("This is a project dependencies")
+       }
+       else if ( requested instanceof ModuleComponentSelector ) {
+					if ( buildFromLocal instanceof String ) {
 
-                       if ( requested instanceof ProjectComponentSelector ) {
-                               info("This is a project dependencies")
-                       }
-                       else if ( requested instanceof ModuleComponentSelector ) {
-
-				if ( buildFromLocal instanceof String ) {
-					// tweak remote dependencie resolution
-					/*if ( requested.group == "io.github.ReleaseStandard.CodeEditor" ) {
-
-						println ">>>Dependency resolution"
-						def modPath = ":CodeEditor-" + requested.getModule()
-						def module = rootProject.findProject(modPath)
-						if ( module == null ) {
-							println "error : ${modPath} not found"
-							info("[ERROR] " + modPath + " not found")
-						} else {
-							println "module=${module}"
-							dependency.useTarget module
+						// tweak remote dependencie resolution
+						def trgGroup = "io.github.ReleaseStandard.CodeEditor"
+						if ( requested.group.matches("${trgGroup}.*") ) {
+							def path = moduleToProject(requested.getDisplayName())
+							def prj = rootProject.findProject(path)
+							//dependency.useTarget "com.fasterxml.jackson.core:jackson-core:2.12.3"
+							dependency.useTarget prj
 						}
-					}*/
-
+					}
 				}
-
 			}
-		}
 		}
 	}
 }
