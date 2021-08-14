@@ -60,7 +60,7 @@ def universalEmbed(moduleSelector) {
     }
 
     def selector = moduleSelector
-    if ( buildFromLocal instanceof String ) {
+    if ( hasProperty('buildFromLocal') ) {
         selector = resolvedSelector
     }
 
