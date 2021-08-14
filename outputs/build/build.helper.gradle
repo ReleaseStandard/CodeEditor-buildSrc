@@ -27,7 +27,6 @@ def getProjectPath(obj) {
 
 // produce project path from the moduleString
 def moduleToProject(moduleString) {
-  println "entry=" + moduleString
   def trgGroup = "io.github.ReleaseStandard.CodeEditor"
   def parts = moduleString.split(":")
   def group = parts[0]
@@ -104,7 +103,7 @@ configurations {
          info("This is a project dependencies")
        }
        else if ( requested instanceof ModuleComponentSelector ) {
-					if ( hasProperty('buildFromLocal') ) {
+					if ( rootProject.hasProperty('buildFromLocal') ) {
 
 						// tweak remote dependencie resolution
 						def trgGroup = "io.github.ReleaseStandard.CodeEditor"

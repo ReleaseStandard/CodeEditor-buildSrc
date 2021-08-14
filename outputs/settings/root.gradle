@@ -30,7 +30,6 @@ def getProjectPath(obj) {
 
 // produce project path from the moduleString
 def moduleToProject(moduleString) {
-  println "entry=" + moduleString
   def trgGroup = "io.github.ReleaseStandard.CodeEditor"
   def parts = moduleString.split(":")
   def group = parts[0]

@@ -63,7 +63,7 @@ configurations {
          info("This is a project dependencies")
        }
        else if ( requested instanceof ModuleComponentSelector ) {
-					if ( hasProperty('buildFromLocal') ) {
+					if ( rootProject.hasProperty('buildFromLocal') ) {
 
 						// tweak remote dependencie resolution
 						def trgGroup = "io.github.ReleaseStandard.CodeEditor"

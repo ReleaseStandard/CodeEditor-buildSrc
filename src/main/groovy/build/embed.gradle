@@ -19,7 +19,7 @@ def universalEmbed(moduleSelector) {
     }
 
     def selector = moduleSelector
-    if ( hasProperty('buildFromLocal') ) {
+    if ( rootProject.hasProperty('buildFromLocal') ) {
         selector = resolvedSelector
     }
 
