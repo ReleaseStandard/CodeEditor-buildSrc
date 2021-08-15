@@ -51,16 +51,14 @@ def universalEmbed(moduleSelector) {
     if ( moduleSelector instanceof String ) {
         resolvedSelector = rootProject.findProject(moduleToProject(moduleSelector))
     }
-    if ( System.env.DEBUG ) {
-        println "moduleSelector=${moduleSelector},resolvedSelector=${resolvedSelector}"
-        for(Configuration c : resolvedSelector.configurations) {
-            println "c=${c.getDisplayName()}"
-        }
-    }
 
     def selector = moduleSelector
     if ( rootProject.hasProperty('buildFromLocal') ) {
         selector = resolvedSelector
+    }
+
+    if ( System.env.DEBUG ) {
+        println "universalEmbed of ${moduleSelector} resolved to ${selector}"
     }
 
     if ( project.plugins.hasPlugin("com.android.library") ) {
@@ -80,17 +78,14 @@ def universalEmbed(moduleSelector) {
             }
         } 
         project.dependencies.embed selector
+    } else if (project.plugins.hasPlugin("java-library")) {
+        project.dependencies.api selector
     } else {
-        project.dependencies.implementation selector
-        if ( selector instanceof Project ) {
-            project.sourceSets { 
-                main {
-                    java {
-                        srcDirs "${selector.projectDir.getPath()}/src/"
-                    }
-                }
-            }
+        println "[ERROR] ${selector} for ${project} is in an unknow form"
+        for(Configuration c : project.configurations) {
+            print "${c.name} "
         }
+        println ""
     }
 }
 
