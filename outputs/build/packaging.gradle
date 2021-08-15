@@ -70,7 +70,7 @@ if ( System.env.VIEW_TYPE ) {
 	} else if (files.length == 1) {
 		vtype = files[0]
 	} else {
-		println "[WARNING] GUESS FAIL: No view for this project" // error here
+		println "[WARNING] GUESS FAIL: No view for $project"
 	}
 }
 vtype=vtype.replaceFirst(VIEW_PREFIX,"")
@@ -90,7 +90,6 @@ if ( (new File(viewFile)).exists() ) {
 	if ( vtype.equals("android") ) {
 		def folder = "${VIEW_PREFIX}android"
 		apply from: "${folder}/build.gradle"
-		apply plugin: 'com.kezong.fat-aar'
 		android.sourceSets {
 			main {
 				manifest.srcFile "${folder}/src/main/AndroidManifest.xml"
@@ -107,17 +106,6 @@ if ( (new File(viewFile)).exists() ) {
 		}
 		android.defaultConfig.versionCode semver.minor
 		android.defaultConfig.versionName "${version}"
-		for(Project p : project.subprojects) {
-			def pname = "${p.name}"
-			try {
-				if (buildFromLocal instanceof String) {
-					pname = "${project.path}:${p.name}"
-				}
-			} catch (Exception e) {}
-			if ( ! isAview(p) ) {
-				universalEmbed project(pname)
-			}
-		}
 		java {
 			sourceCompatibility = javaVersion
 			targetCompatibility = javaVersion
@@ -126,9 +114,10 @@ if ( (new File(viewFile)).exists() ) {
 
 } else {
 	apply plugin: 'java-library'
-	for(Project p : project.subprojects) {
-		if ( ! isAview(p) ) {
-			universalEmbed p
-		}
+}
+// include all subprojects into this node project
+for(Project p : project.subprojects) {
+	if ( ! isAview(p) ) {
+		universalEmbed p
 	}
 }

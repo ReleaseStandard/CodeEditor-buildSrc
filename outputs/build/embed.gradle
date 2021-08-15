@@ -79,7 +79,33 @@ def universalEmbed(moduleSelector) {
         } 
         project.dependencies.embed selector
     } else if (project.plugins.hasPlugin("java-library")) {
+        apply plugin: 'com.github.johnrengelman.shadow'
         project.dependencies.api selector
+        project.dependencies.shadow selector
+
+        // Add tasks propagation
+        selector.afterEvaluate {
+            for(Task t : project.tasks) {
+                if ( t.getName().equals("projects") ) { continue }
+                try {
+                    def rootAssemble = project.tasks.getByName(t.getName())
+                    def childAssemble = selector.tasks.getByName(t.getName())
+                    rootAssemble.dependsOn childAssemble
+                    rootAssemble.mustRunAfter childAssemble
+                    rootAssemble.doLast {
+                        project.jar {
+                            from {
+                                project.configurations.shadow.collect { it.isDirectory() ? it : zipTree(it).matching {
+                                        exclude "module-info.*"
+                                    } 
+                                }
+                            }
+                        }
+                    }
+                } catch(Exception e) {}
+            }
+        }
+
     } else {
         println "[ERROR] ${selector} for ${project} is in an unknow form"
         for(Configuration c : project.configurations) {
