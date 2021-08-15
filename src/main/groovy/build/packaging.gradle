@@ -54,16 +54,16 @@ if ( (new File(viewFile)).exists() ) {
 		android.sourceSets {
 			main {
 				manifest.srcFile "${folder}/src/main/AndroidManifest.xml"
-			        java.srcDirs = ["${folder}/src/main/java"]
-			        res.srcDirs = ["${folder}/src/main/res"]
+		        java.srcDirs = ["${folder}/src/main/java"]
+		        res.srcDirs = ["${folder}/src/main/res"]
 			}
 		}
 		android.packagingOptions {
 			exclude "**/module-info.class"
 		}
 		android.compileOptions {
-                        sourceCompatibility javaVersion
-                        targetCompatibility javaVersion
+            sourceCompatibility javaVersion
+            targetCompatibility javaVersion
 		}
 		android.defaultConfig.versionCode semver.minor
 		android.defaultConfig.versionName "${version}"

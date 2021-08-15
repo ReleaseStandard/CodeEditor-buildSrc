@@ -70,8 +70,14 @@ configurations {
 						if ( requested.group.matches("${trgGroup}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)
+
+							// TODO : need to ensure that the assemble has runned on the subproject before useTarget
+							// you must dependends on this build
+							//def tAssemble = prj.tasks.getByName("assemble")
+
 							dependency.useTarget prj
 						}
+
 					}
 				}
 			}
