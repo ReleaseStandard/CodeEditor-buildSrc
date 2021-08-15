@@ -114,10 +114,10 @@ configurations {
 							// TODO : need to ensure that the assemble has runned on the subproject before useTarget
 							// you must dependends on this build
 							//def tAssemble = prj.tasks.getByName("assemble")
-              def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
-              if ( System.env.DEBUG ) {
-                println "DependencySubstitution: ${explain}"
-              }
+							def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
+							if ( System.env.DEBUG ) {
+								println "DependencySubstitution: ${explain}"
+							}
 							dependency.useTarget(prj, "${explain}")
 						}
 

@@ -85,7 +85,7 @@ if ( (new File(viewFile)).exists() ) {
 	}
 
 } else {
-	apply plugin: 'java'
+	apply plugin: 'java-library'
 	for(Project p : project.subprojects) {
 		if ( ! isAview(p) ) {
 			universalEmbed p
