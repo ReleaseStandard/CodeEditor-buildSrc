@@ -70,7 +70,6 @@ configurations {
 						if ( requested.group.matches("${trgGroup}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)
-							//dependency.useTarget "com.fasterxml.jackson.core:jackson-core:2.12.3"
 							dependency.useTarget prj
 						}
 					}

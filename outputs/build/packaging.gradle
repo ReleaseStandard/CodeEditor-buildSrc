@@ -122,7 +122,6 @@ if ( (new File(viewFile)).exists() ) {
 			sourceCompatibility = javaVersion
 			targetCompatibility = javaVersion
 		}
-		project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.release }
 	}
 
 } else {
@@ -138,5 +137,4 @@ if ( (new File(viewFile)).exists() ) {
 			}
 		}
 	}
-	project.afterEvaluate { project.ext["softwareComponentChoosed"] = project.components.java }
 }
