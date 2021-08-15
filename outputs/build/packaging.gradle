@@ -128,13 +128,7 @@ if ( (new File(viewFile)).exists() ) {
 	apply plugin: 'java'
 	for(Project p : project.subprojects) {
 		if ( ! isAview(p) ) {
-			project.sourceSets { 
-				main {
-					java {
-						srcDirs "${p.name}/src/"
-					}
-				}
-			}
+			universalEmbed p
 		}
 	}
 }

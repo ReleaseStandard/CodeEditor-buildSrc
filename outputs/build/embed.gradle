@@ -82,6 +82,15 @@ def universalEmbed(moduleSelector) {
         project.dependencies.embed selector
     } else {
         project.dependencies.implementation selector
+        if ( selector instanceof Project ) {
+            project.sourceSets { 
+                main {
+                    java {
+                        srcDirs "${selector.projectDir.getPath()}/src/"
+                    }
+                }
+            }
+        }
     }
 }
 
