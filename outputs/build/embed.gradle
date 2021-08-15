@@ -68,6 +68,17 @@ def universalEmbed(moduleSelector) {
         fataar {
             transitive = true
         }
+        if ( selector instanceof Project ) {
+            selector.afterEvaluate {
+                if ( !selector.plugins.hasPlugin("com.android.library")) {
+                    if ( System.env.DEBUG ) {
+                        println "${project} -> ${selector} don't have the plugin"
+                        println "Due to a limitation of fat-aar we must correct that here"
+                    }
+                    project.dependencies.api selector
+                }
+            }
+        } 
         project.dependencies.embed selector
     } else {
         project.dependencies.implementation selector
