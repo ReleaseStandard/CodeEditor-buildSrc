@@ -90,6 +90,12 @@ allprojects { Project p ->
 			println "thisProject=${thisProject.name},p=${p.name}"
 		}
 
+		if (  ! ( p.plugins.hasPlugin('com.android.library') 
+			|| p.plugins.hasPlugin('java-library') ) ) {
+			println "[WARNING] $p cannot be published to MavenCentral"
+			return
+		}
+
 		def pubname = producePublicationTaskName(p)
 		try {
 			p.tasks.getByName(getPublicationTaskName("${pubname}"))
@@ -105,12 +111,10 @@ allprojects { Project p ->
 							p.afterEvaluate {
 								from p.components.release
 							}
-						} else if ( p.plugins.hasPlugin('java') || p.plugins.hasPlugin('java-library') ) {
+						} else if ( p.plugins.hasPlugin('java-library') ) {
 							p.afterEvaluate {
 								from p.components.java
 							}
-						} else {
-							println "[ERROR] Publication to MavenCentral impossible for project \"${p.name}\""
 						}
 
 						def artifactGroup = "io.github.${githubOwner}.CodeEditor"
@@ -155,22 +159,21 @@ allprojects { Project p ->
 				        sign thisProject.publishing.publications."${pubname}"
 				}
 				if ( System.env.DEBUG ) {
-					println ""
-					println "thisProject {"
-					listTasksOfProject(thisProject)
-					println "}"
-					println "p {"
-					listTasksOfProject(p)
-					println "}"
+					println "mavenCentralPublish: register " + getPublicationTaskName("${pubname}") + " on $thisProject"
 				}
 				try {
 					// Make that signature task is executed after the reBundleAarRelease //
 					def t = thisProject.tasks.getByName(getPublicationTaskName("${pubname}"))
 					p.afterEvaluate {
-						try {
-							Task ta = p.tasks.getByName("reBundleAarRelease")
-							ta.finalizedBy t
-						} catch(Exception e) {}
+						if ( p.plugins.hasPlugin("com.kezong.fat-aar") ) {
+							Task ta = null
+							try {
+								ta = p.tasks.getByName("reBundleAarRelease")
+							} catch(Exception e) {}
+							if ( ta != null ) {
+								t.mustRunAfter ta
+							}
+						}
 					}
 				} catch(Exception e) { println "[WARNING] could not provide signature for ${p.name}" }
 			}
