@@ -204,10 +204,11 @@ allprojects { Project p ->
 					println "}"
 				}
 				try {
+					// Make that signature task is executed after the reBundleAarRelease //
 					def t = thisProject.tasks.getByName(getPublicationTaskName("${pubname}"))
-					afterEvaluate {
+					p.afterEvaluate {
 						try {
-							Task ta = thisProject.tasks.getByName("reBundleAarRelease")
+							Task ta = p.tasks.getByName("reBundleAarRelease")
 							ta.finalizedBy t
 						} catch(Exception e) {}
 					}
