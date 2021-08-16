@@ -70,10 +70,15 @@ configurations {
 						if ( requested.group.matches("${trgGroup}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)
-
-							// TODO : need to ensure that the assemble has runned on the subproject before useTarget
-							// you must dependends on this build
-							//def tAssemble = prj.tasks.getByName("assemble")
+							for(Task t : project.tasks) {
+								if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
+								try {
+									def rootAssemble = project.tasks.getByName(t.getName())
+				                      			def childAssemble = prj.tasks.getByName(t.getName())
+				                      			rootAssemble.dependsOn childAssemble
+				                      			rootAssemble.mustRunAfter childAssemble
+				                  		} catch(Exception e) {}
+				                	}
 							def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
 							if ( System.env.DEBUG ) {
 								println "DependencySubstitution: ${explain}"

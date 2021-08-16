@@ -57,7 +57,7 @@ def universalEmbed(moduleSelector) {
         if ( selector instanceof Project ) {
             selector.afterEvaluate {
                 for(Task t : project.tasks) {
-                    if ( t.getName().equals("projects") ) { continue }
+                    if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
                     try {
                         def rootAssemble = project.tasks.getByName(t.getName())
                         def childAssemble = selector.tasks.getByName(t.getName())
