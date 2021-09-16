@@ -79,6 +79,13 @@ if ( (new File(viewFile)).exists() ) {
 		}
 	} else if ( vtype.equals("terminal") ) {
 		println "Configure additionnal properties here ..."
+		sourceSets {
+			main {
+				java {
+					srcDirs 'view-terminal/src/main/java'
+				}
+			}
+		}
 	}
 } else {
 	apply plugin: 'java-library'
