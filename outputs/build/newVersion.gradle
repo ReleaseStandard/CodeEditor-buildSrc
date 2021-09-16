@@ -38,8 +38,10 @@ def moduleToProject(moduleString) {
   return path
 }
 
+// BEGIN newVersion
 //
-// This file define how version number is automatically increase
+// Manage versions of this project
+// 
 //
 task newVersion() {
         dependsOn incrementMinor
@@ -65,7 +67,7 @@ task version() {
 	}
 }
 task versionRelease() {
-	dependsOn assemble
+	dependsOn "assemble"
 	doLast {
 		println ""
 		println ""
@@ -75,3 +77,4 @@ task versionRelease() {
 		println ""
 	}
 }
+// END

@@ -1,6 +1,10 @@
+// BEGIN packaging.gradle
 //
 // It is up to the module to support zero or more views (if no view given : a java library is maid)
-//
+//  - embed all projects into the main
+//  - list supported views
+//  - change the packaging mode (from what view has been choosed)
+
 def vtype = ""
 ext["VIEW_PREFIX"] = "view-"
 import org.apache.tools.ant.DirectoryScanner
@@ -26,11 +30,14 @@ if ( System.env.VIEW_TYPE ) {
 } else {
 	String [] files = getSupportedViews()
 	if ( files.length > 1 ) {
-		println "[WARNING] GUESS FAIL: Multiple views found for this project you must specify one to choose from"
+		vtype="android"
+		def msg="[WARNING] This project is compatible with different views, please specify one with VIEW_TYPE env"
+		println msg
+		println "Choosing android ..."
 	} else if (files.length == 1) {
 		vtype = files[0]
 	} else {
-		println "[WARNING] GUESS FAIL: No view for $project"
+		println "[WARNING] GUESS FAIL: No views for $project"
 	}
 }
 vtype=vtype.replaceFirst(VIEW_PREFIX,"")
@@ -47,9 +54,9 @@ task listSupportedViews() {
 def javaVersion = JavaVersion.VERSION_1_8
 def viewFile = "${project.projectDir.getPath()}/${VIEW_PREFIX}${vtype}"
 if ( (new File(viewFile)).exists() ) {
+	def folder = "${VIEW_PREFIX}${vtype}"
+	apply from: "${folder}/build.gradle"
 	if ( vtype.equals("android") ) {
-		def folder = "${VIEW_PREFIX}android"
-		apply from: "${folder}/build.gradle"
 		android.sourceSets {
 			main {
 				manifest.srcFile "${folder}/src/main/AndroidManifest.xml"
@@ -70,8 +77,9 @@ if ( (new File(viewFile)).exists() ) {
 			sourceCompatibility = javaVersion
 			targetCompatibility = javaVersion
 		}
+	} else if ( vtype.equals("terminal") ) {
+		println "Configure additionnal properties here ..."
 	}
-
 } else {
 	apply plugin: 'java-library'
 }
@@ -81,3 +89,5 @@ for(Project p : project.subprojects) {
 		universalEmbed p
 	}
 }
+
+// END

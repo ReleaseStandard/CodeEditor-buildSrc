@@ -1,3 +1,8 @@
+// BEGIN build.helper.gradle
+//
+// - implementation relative for projects
+// - change remote to local when property buildFromLocal is set
+//
 def prefix(msg) {
 	return "[TEST]" + msg
 }
@@ -93,3 +98,4 @@ configurations {
 	}
 }
 
+// END

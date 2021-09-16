@@ -38,6 +38,10 @@ def moduleToProject(moduleString) {
   return path
 }
 
+// BEGIN mavenCentralPublish.gradle
+//
+// Configure mavenCentral publication
+//
 apply plugin: 'maven'
 apply plugin: 'signing'
 

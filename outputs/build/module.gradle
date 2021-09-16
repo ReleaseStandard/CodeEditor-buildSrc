@@ -38,8 +38,13 @@ def moduleToProject(moduleString) {
   return path
 }
 
+// BEGIN module.gradle
 //
 // Used to compile a module from CodeEditor (eg editor)
+//  - modules used in all projects
+//  - repositories
+//  - system that allow to fetch the latest version from github
+//  - include other plugins of this project
 //
 buildscript {
         ext["buildScriptRepos"] = {

@@ -1,6 +1,8 @@
+// BEGIN embed.gradle
 //
-// This class an universal way to embed dependencies into the final object
-//
+// Used to provide universalEmbed configuration property
+//  - shadow for java library projects (jar)
+//  - fat-aar for android library projects
 
 def universalEmbed(moduleSelector) {
 
@@ -92,3 +94,5 @@ def universalEmbed(moduleSelector) {
 project.ext.set("universalEmbed",{ Object moduleSelector ->
         universalEmbed(moduleSelector)
 })
+
+// END
