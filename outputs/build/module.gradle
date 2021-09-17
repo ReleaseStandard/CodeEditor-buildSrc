@@ -92,6 +92,12 @@ allprojects { Project p ->
 	usePlugin(p, "embed.gradle")
 	usePlugin(p, "build.helper.gradle")
 	p.apply plugin: 'jacoco'
+
+	p.afterEvaluate {
+		p.dependencies {
+			testImplementation 'junit:junit:4.+'
+		}
+	}
 }
 
 usePlugin(project, "packaging.gradle")
