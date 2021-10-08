@@ -40,6 +40,9 @@ group = "io.github.${githubOwner}.CodeEditor"
 
 apply plugin: "net.thauvin.erik.gradle.semver"
 
+def doesTaskNeedManifold(name) {
+    return name.contains("Test") && !name.contains("Fixtures")
+}
 def usePlugin(project, plugin) {
 	if ( System.env.USE_LOCAL_BUILDSRC ) {
                 project.apply from: "${rootDir.getPath()}/buildSrc/outputs/build/${plugin}"
@@ -57,7 +60,7 @@ allprojects { Project p ->
             if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
                if (sourceSets.main.allJava.files.any { it.name == "module-info.java" }) {
                     tasks.withType(JavaCompile) {
-                        if ( getName().contains("Test") ) {
+                        if ( doesTaskNeedManifold(getName()) ) {
                                 // If you DO define a module-info.java file:
                                 options.compilerArgs += ['-Xplugin:Manifold', '--module-path', it.classpath.asPath]
                         }
@@ -68,7 +71,7 @@ allprojects { Project p ->
            }
         } catch(Exception e) {
            p.tasks.withType(JavaCompile) {
-                if ( getName().contains("Test") ) {
+                if ( doesTaskNeedManifold(getName()) ) {
                         // If you DO NOT define a module-info.java file:
                         options.compilerArgs += ['-Xplugin:Manifold']
                 }
