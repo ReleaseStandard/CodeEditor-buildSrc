@@ -80,6 +80,15 @@ project.ext.set("implementationR",{ String path ->
         implementationR(path)
 })
 
+project.ext.set("testImplementationR",{ String path ->
+        testImplementationR(path)
+})
+
+project.ext.set("testFixturesImplementationR",{ String path ->
+        testFixturesImplementationR(path)
+})
+
+
 
 configurations {
 	all {
