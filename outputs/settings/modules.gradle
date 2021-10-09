@@ -2,6 +2,8 @@
 // this script play this role
 
 // src/main/groovy//settings//lib.gradle
+ext['githubOwner'] = "ReleaseStandard"
+
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {

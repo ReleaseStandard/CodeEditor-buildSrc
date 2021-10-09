@@ -9,7 +9,6 @@ def Properties properties = new Properties()
 if ( (new File('local.properties')).exists() ) {
 	properties.load(project.file("local.properties").newDataInputStream())
 }
-ext['githubOwner'] = "ReleaseStandard"
 ext['githubOwnerEmail'] = "releasestandard@netc.eu"
 ext['githubOwnerName'] = "Release Standard"
 for(Map.Entry<String, String> e : new HashMap(){{

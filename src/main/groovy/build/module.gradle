@@ -35,7 +35,6 @@ buildscript {
 //
 // Setup root project
 //
-ext['githubOwner'] = "ReleaseStandard"
 group = "io.github.${githubOwner}.CodeEditor"
 
 apply plugin: "net.thauvin.erik.gradle.semver"

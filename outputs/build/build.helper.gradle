@@ -1,3 +1,5 @@
+ext['githubOwner'] = "ReleaseStandard"
+
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {
@@ -141,7 +143,7 @@ configurations {
 					if ( rootProject.hasProperty('buildFromLocal') ) {
 
 						// tweak remote dependencie resolution
-						def trgGroup = "io.github.ReleaseStandard.CodeEditor"
+						def trgGroup = "io.github.${githubOwner}.CodeEditor"
 						if ( requested.group.matches("${trgGroup}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)

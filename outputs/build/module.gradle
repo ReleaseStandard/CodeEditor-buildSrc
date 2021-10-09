@@ -1,3 +1,5 @@
+ext['githubOwner'] = "ReleaseStandard"
+
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {
@@ -75,7 +77,6 @@ buildscript {
 //
 // Setup root project
 //
-ext['githubOwner'] = "ReleaseStandard"
 group = "io.github.${githubOwner}.CodeEditor"
 
 apply plugin: "net.thauvin.erik.gradle.semver"

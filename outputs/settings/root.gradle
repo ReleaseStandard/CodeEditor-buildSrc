@@ -1,6 +1,8 @@
 // root project of CodeEditor have common parts with modules so we manage that here
 
 // src/main/groovy//settings//lib.gradle
+ext['githubOwner'] = "ReleaseStandard"
+
 def p(msg) {
 	def debug = System.env.DEBUG
 	if ( debug ) {

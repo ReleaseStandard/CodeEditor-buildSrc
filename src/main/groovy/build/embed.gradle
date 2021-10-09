@@ -46,7 +46,7 @@ def universalEmbed(moduleSelector) {
         apply plugin: 'com.github.johnrengelman.shadow'
         if ( rootProject.hasProperty('buildFromLocal') ) {
             if ( selector instanceof String ) {
-                def trgGroup = "io.github.ReleaseStandard.CodeEditor"
+                def trgGroup = "io.github.${githubOwner}.CodeEditor"
                 if ( selector.matches("${trgGroup}.*") ) {
                     selector = rootProject.findProject(moduleToProject(selector))
                 }
