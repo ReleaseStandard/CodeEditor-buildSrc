@@ -83,6 +83,7 @@ def resolveRelativePath(path) {
         println "[WARNING] : path resolution has failed"
         return null
 }
+// Use this to declare a production dependency on a local project
 def implementationR(path) {
 
         def finalPath = resolveRelativePath(path)
@@ -92,6 +93,26 @@ def implementationR(path) {
         dependencies {
                 universalEmbed project(path: finalPath)
         }
+}
+// Use this to declare a test dependecy on a local project
+def testImplementationR(path) {
+        def finalPath = resolveRelativePath(path)
+        if ( System.env.DEBUG ) {
+                println "testImplementationR : finalPath=${finalPath}"
+        }
+	dependencies {
+		testImplementation project(path: finalPath)
+	}
+}
+// Use this to declare a testFixtures on a local project
+def testFixturesImplementationR(path) {
+        def finalPath = resolveRelativePath(path)
+        if ( System.env.DEBUG ) {
+                println "testImplementationR : finalPath=${finalPath}"
+        }
+	dependencies {
+		testFixturesImplementation project(path: finalPath)
+	}
 }
 
 
