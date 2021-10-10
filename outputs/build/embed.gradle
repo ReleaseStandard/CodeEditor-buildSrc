@@ -55,7 +55,10 @@ def universalEmbed(selector) {
             selector = selector.getDependencyProject()
         }
         if (selector instanceof String) {
-            selector = rootProject.findProject(moduleToProject(selector))
+            def trgGroup = "io.github.${githubOwner}.CodeEditor"
+            if ( selector.matches("${trgGroup}.*") ) {
+                selector = rootProject.findProject(moduleToProject(selector))
+            }
         }
         p("The selector has been translated to local dependency : ${selector}")
     }
@@ -65,7 +68,7 @@ def universalEmbed(selector) {
         fataar {
             transitive = true
         }
-    if ( rootProject.hasProperty('buildFromLocal') ) {
+        if ( rootProject.hasProperty('buildFromLocal') ) {
             if ( selector instanceof Project ) {
                 selector.afterEvaluate {
                     if ( !selector.plugins.hasPlugin("com.android.library")) {
@@ -76,20 +79,12 @@ def universalEmbed(selector) {
                         project.dependencies.implementation selector
                     }
                 }
-        }
+            }
         } 
         project.dependencies.embed selector
     } else if (project.plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
-        if ( rootProject.hasProperty('buildFromLocal') ) {
-            if ( selector instanceof String ) {
-                def trgGroup = "io.github.${githubOwner}.CodeEditor"
-                if ( selector.matches("${trgGroup}.*") ) {
-                    selector = rootProject.findProject(moduleToProject(selector))
-                }
-            }
-            project.dependencies.implementation selector
-        }
+        project.dependencies.implementation selector
         project.dependencies.shadow selector
 
         // Add tasks propagation
