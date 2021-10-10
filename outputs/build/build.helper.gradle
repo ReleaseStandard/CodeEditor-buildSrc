@@ -132,16 +132,16 @@ project.ext.set("testFixturesImplementationR",{ String path ->
 
 
 
-configurations {
-	all {
-		resolutionStrategy {
-			dependencySubstitution.all { DependencySubstitution dependency ->
-       if ( requested instanceof ProjectComponentSelector ) {
-         info("This is a project dependencies")
-       }
-       else if ( requested instanceof ModuleComponentSelector ) {
-					if ( rootProject.hasProperty('buildFromLocal') ) {
-
+if ( rootProject.hasProperty('buildFromLocal') ) {
+	configurations {
+		all {
+			resolutionStrategy {
+				dependencySubstitution.all { DependencySubstitution dependency ->
+				   if ( requested instanceof ProjectComponentSelector ) {
+					   // do nothing
+				   }
+				   else if ( requested instanceof ModuleComponentSelector )
+				   {
 						// tweak remote dependencie resolution
 						def trgGroup = "io.github.${githubOwner}.CodeEditor"
 						if ( requested.group.matches("${trgGroup}.*") ) {
@@ -150,20 +150,19 @@ configurations {
 							for(Task t : project.tasks) {
 								if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
 								try {
-									def rootAssemble = project.tasks.getByName(t.getName())
-				                      			def childAssemble = prj.tasks.getByName(t.getName())
-				                      			rootAssemble.dependsOn childAssemble
-				                      			rootAssemble.mustRunAfter childAssemble
-				                  		} catch(Exception e) {}
-				                	}
+									def rootAssemble = t
+									def childAssemble = prj.tasks.getByName(t.getName())
+									rootAssemble.dependsOn childAssemble
+									rootAssemble.mustRunAfter childAssemble
+								} catch(Exception e) {}
+							}
 							def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
 							if ( System.env.DEBUG ) {
 								println "DependencySubstitution: ${explain}"
 							}
 							dependency.useTarget(prj, "${explain}")
 						}
-
-					}
+				   }
 				}
 			}
 		}
