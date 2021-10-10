@@ -4,23 +4,18 @@
 //  - shadow for java library projects (jar)
 //  - fat-aar for android library projects
 
-def universalEmbed(moduleSelector) {
+def universalEmbed(selector) {
 
-    def resolvedSelector = moduleSelector
-    if ( moduleSelector instanceof ProjectDependency ) {
-        resolvedSelector = moduleSelector.getDependencyProject()
-    }
-    if ( moduleSelector instanceof String ) {
-        resolvedSelector = rootProject.findProject(moduleToProject(moduleSelector))
-    }
+    p("universalEmbed of ${selector}")
 
-    def selector = moduleSelector
     if ( rootProject.hasProperty('buildFromLocal') ) {
-        selector = resolvedSelector
-    }
-
-    if ( System.env.DEBUG ) {
-        println "universalEmbed of ${moduleSelector} resolved to ${selector}"
+        if (selector instanceof ProjectDependency) {
+            selector = selector.getDependencyProject()
+        }
+        if (selector instanceof String) {
+            selector = rootProject.findProject(moduleToProject(selector))
+        }
+        p("The selector has been translated to local dependency : ${selector}")
     }
 
     if ( project.plugins.hasPlugin("com.android.library") ) {
@@ -36,7 +31,7 @@ def universalEmbed(moduleSelector) {
                             println "${project} -> ${selector} don't have the plugin"
                             println "Due to a limitation of fat-aar we must correct that here"
                         }
-                        project.dependencies.api selector
+                        project.dependencies.implementation selector
                     }
                 }
         }
@@ -51,7 +46,7 @@ def universalEmbed(moduleSelector) {
                     selector = rootProject.findProject(moduleToProject(selector))
                 }
             }
-            project.dependencies.api selector
+            project.dependencies.implementation selector
         }
         project.dependencies.shadow selector
 
