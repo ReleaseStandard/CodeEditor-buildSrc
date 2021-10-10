@@ -94,10 +94,11 @@ configurations {
 	all {
 		resolutionStrategy {
 			dependencySubstitution.all { DependencySubstitution dependency ->
-       if ( requested instanceof ProjectComponentSelector ) {
-         info("This is a project dependencies")
-       }
-       else if ( requested instanceof ModuleComponentSelector ) {
+			   if ( requested instanceof ProjectComponentSelector ) {
+				 info("This is a project dependencies")
+			   }
+			   else if ( requested instanceof ModuleComponentSelector )
+			   {
 					if ( rootProject.hasProperty('buildFromLocal') ) {
 
 						// tweak remote dependencie resolution
@@ -109,11 +110,11 @@ configurations {
 								if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
 								try {
 									def rootAssemble = project.tasks.getByName(t.getName())
-				                      			def childAssemble = prj.tasks.getByName(t.getName())
-				                      			rootAssemble.dependsOn childAssemble
-				                      			rootAssemble.mustRunAfter childAssemble
-				                  		} catch(Exception e) {}
-				                	}
+												def childAssemble = prj.tasks.getByName(t.getName())
+												rootAssemble.dependsOn childAssemble
+												rootAssemble.mustRunAfter childAssemble
+										} catch(Exception e) {}
+									}
 							def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
 							if ( System.env.DEBUG ) {
 								println "DependencySubstitution: ${explain}"
@@ -122,7 +123,7 @@ configurations {
 						}
 
 					}
-				}
+			   }
 			}
 		}
 	}

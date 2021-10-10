@@ -82,12 +82,6 @@ def universalEmbed(selector) {
     } else if (project.plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
         if ( rootProject.hasProperty('buildFromLocal') ) {
-            if ( selector instanceof String ) {
-                def trgGroup = "io.github.${githubOwner}.CodeEditor"
-                if ( selector.matches("${trgGroup}.*") ) {
-                    selector = rootProject.findProject(moduleToProject(selector))
-                }
-            }
             project.dependencies.implementation selector
         }
         project.dependencies.shadow selector
