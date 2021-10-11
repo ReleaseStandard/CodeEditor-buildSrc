@@ -132,11 +132,12 @@ if ( (new File(viewFile)).exists() ) {
 } else {
 	apply plugin: 'java-library'
 }
+beforeEvaluate {
 // include all subprojects into this node project
-for(Project p : project.subprojects) {
-	if ( ! isAview(p) ) {
-		universalEmbed p
+	for (Project p : project.subprojects) {
+		if (!isAview(p)) {
+			project.dependencies.universalEmbed p
+		}
 	}
 }
-
 // END

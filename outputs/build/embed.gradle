@@ -46,11 +46,20 @@ def moduleToProject(moduleString) {
 //  - shadow for java library projects (jar)
 //  - fat-aar for android library projects
 
-def universalEmbed(selector) {
+configurations {
+    universalEmbed
+    implementation.extendsFrom(universalEmbed)
+}
 
-    p("universalEmbed of ${selector}")
+afterEvaluate {
 
-    if ( rootProject.hasProperty('buildFromLocal') ) {
+    configurations.universalEmbed.collect {
+        p("Add artifact ${it} to ${project}")
+        def _it = it
+
+        // Add tasks propagation : we must (compile project(':model'))
+        /*
+            if ( rootProject.hasProperty('buildFromLocal') ) {
         if (selector instanceof ProjectDependency) {
             selector = selector.getDependencyProject()
         }
@@ -61,69 +70,40 @@ def universalEmbed(selector) {
         }
         p("The selector has been translated to local dependency : ${selector}")
     }
+         */
 
-    if ( project.plugins.hasPlugin("com.android.library") ) {
-        apply plugin: 'com.kezong.fat-aar'
-        fataar {
-            transitive = true
-        }
-        if ( rootProject.hasProperty('buildFromLocal') ) {
-            if ( selector instanceof Project ) {
-                selector.afterEvaluate {
-                    if ( !selector.plugins.hasPlugin("com.android.library")) {
-                        if ( System.env.DEBUG ) {
-                            println "${project} -> ${selector} don't have the plugin"
-                            println "Due to a limitation of fat-aar we must correct that here"
-                        }
-                        project.dependencies.implementation selector
+        if (plugins.hasPlugin("java-library")) {
+            p("Need to add ${it} to ${project} a java-library(jar)")
+            jar {
+                from {
+                    _it.isDirectory() ? _it : zipTree(_it).matching {
+                        exclude "module-info.*"
                     }
                 }
             }
-        } 
-        project.dependencies.embed selector
-    } else if (project.plugins.hasPlugin("java-library")) {
-        apply plugin: 'com.github.johnrengelman.shadow'
-        project.dependencies.implementation selector
-        project.dependencies.shadow selector
-
-        // Add tasks propagation
-        if ( selector instanceof Project ) {
-            selector.afterEvaluate {
-                for(Task t : project.tasks) {
-                    if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
-                    try {
-                        def rootAssemble = project.tasks.getByName(t.getName())
-                        def childAssemble = selector.tasks.getByName(t.getName())
-                        rootAssemble.dependsOn childAssemble
-                        rootAssemble.mustRunAfter childAssemble
-                        rootAssemble.doLast {
-                            project.jar {
-                                from {
-                                    project.configurations.shadow.collect { it.isDirectory() ? it : zipTree(it).matching {
-                                            exclude "module-info.*"
-                                        } 
-                                    }
-                                }
-                            }
-                        }
-                    } catch(Exception e) {}
-                }
+        } else if ( plugins.hasPlugin('com.android.library')) {
+            p("Need to add ${it} to ${project} a com.android.library(aar)")
+            apply plugin: 'com.kezong.fat-aar'
+            fataar {
+                transitive = true
             }
+            /*if ( rootProject.hasProperty('buildFromLocal') ) {
+                if ( selector instanceof Project ) {
+                    selector.afterEvaluate {
+                        if ( !selector.plugins.hasPlugin("com.android.library")) {
+                            p "${project} -> ${selector} don't have the plugin"
+                            p "Due to a limitation of fat-aar we must correct that here"
+                            dependencies.implementation selector
+                        }
+                    }
+                }
+            }*/
+            configurations.embed.extendsFrom(configurations.universalEmbed)
+        } else {
+            p("Embed has failed : unknow form")
+            System.exit(1)
         }
-
-    } else {
-        println "[ERROR] ${selector} for ${project} is in an unknow form"
-        for(Configuration c : project.configurations) {
-            print "${c.name} "
-        }
-        println ""
     }
 }
-
-
-
-project.ext.set("universalEmbed",{ Object moduleSelector ->
-        universalEmbed(moduleSelector)
-})
 
 // END
