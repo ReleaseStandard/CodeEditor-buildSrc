@@ -100,32 +100,24 @@ project.ext.set("projectR",{ String path ->
 	projectR(path)
 })
 
-if ( rootProject.hasProperty('buildFromLocal') ) {
-	configurations {
-		all {
-			resolutionStrategy {
-				dependencySubstitution.all { DependencySubstitution dependency ->
-					if ( requested instanceof ProjectComponentSelector ) {
-						// do nothing
-						p("trying to resolve : ${requested}")
-					}
-					else if ( requested instanceof ModuleComponentSelector )
-					{
-						p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
-						// tweak remote dependencie resolution
-						if ( requested.group.matches("${groupPathBase}.*") ) {
-							def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
-							p("path=${path}")
-							def prj = rootProject.findProject(path)
-							for(Task t : project.tasks) {
-								if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
-								try {
-									def rootAssemble = t
-									def childAssemble = prj.tasks.getByName(t.getName())
-									rootAssemble.dependsOn childAssemble
-									rootAssemble.mustRunAfter childAssemble
-								} catch(Exception e) {}
-							}
+
+
+configurations {
+	all {
+		resolutionStrategy {
+			dependencySubstitution.all { DependencySubstitution dependency ->
+				if ( requested instanceof ProjectComponentSelector ) {
+					// do nothing
+				}
+				else if ( requested instanceof ModuleComponentSelector )
+				{
+					p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
+					// tweak remote dependencie resolution
+					if ( requested.group.matches("${groupPathBase}.*") ) {
+						def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
+						p("path=${path}")
+						def prj = rootProject.findProject(path)
+						if ( prj != null ) {
 							p("Substitute ${requested.getDisplayName()} to ${prj} because we test")
 							dependency.useTarget(prj, "${explain}")
 						}

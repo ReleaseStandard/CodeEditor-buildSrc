@@ -53,27 +53,6 @@ configurations {
 }
 
 afterEvaluate {
-
-    configurations.all { Configuration c ->
-        c.dependencies.with {
-            for (Dependency dependency : it) {
-                if (dependency instanceof DefaultProjectDependency) {
-                    Project targetProject = dependency.getDependencyProject()
-                    for (Task rootTask : project.tasks.withType(JavaCompile)) {
-                        p("${rootTask} search into project ${targetProject}")
-                        Task childTask = targetProject.tasks.findByName(rootTask.getName())
-                        if (childTask == null) {
-                            continue;
-                        }
-                        p("${rootTask} -> ${childTask}")
-                        rootTask.dependsOn childTask
-                        rootTask.mustRunAfter childTask
-                    }
-                }
-            }
-        }
-    }
-
     configurations.universalEmbed.collect {
         p("Add artifact ${it} to ${project}")
         if (plugins.hasPlugin("java-library")) {

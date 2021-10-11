@@ -50,6 +50,7 @@ def moduleToProject(moduleString) {
 def vtype = ""
 ext["VIEW_PREFIX"] = "view-"
 import org.apache.tools.ant.DirectoryScanner
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 
 // list view supported by this project
 def getSupportedViews() {
@@ -132,11 +133,34 @@ if ( (new File(viewFile)).exists() ) {
 } else {
 	apply plugin: 'java-library'
 }
+
 beforeEvaluate {
 // include all subprojects into this node project
 	for (Project p : subprojects) {
 		if (!isAview(p)) {
 			dependencies.universalEmbed p
+		}
+	}
+}
+
+// link tasks that need to be
+afterEvaluate {
+	configurations.all { Configuration c ->
+		c.dependencies.all { Dependency dependency ->
+			if (dependency instanceof DefaultProjectDependency) {
+				Project targetProject = dependency.dependencyProject
+				if ( targetProject != project ) {
+					p "resolve dependency : ${dependency} for ${project}($c)"
+					for (Task rootTask : tasks.withType(JavaCompile)) {
+						Task childTask = targetProject.tasks.findByName(rootTask.getName())
+						if (childTask == null) {
+							continue;
+						}
+						rootTask.dependsOn childTask
+						rootTask.mustRunAfter childTask
+					}
+				}
+			}
 		}
 	}
 }
