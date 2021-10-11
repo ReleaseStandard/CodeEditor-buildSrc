@@ -107,13 +107,15 @@ if ( rootProject.hasProperty('buildFromLocal') ) {
 				dependencySubstitution.all { DependencySubstitution dependency ->
 					if ( requested instanceof ProjectComponentSelector ) {
 						// do nothing
-						System.err.println("trying to resolve : ${requested}")
+						p("trying to resolve : ${requested}")
 					}
 					else if ( requested instanceof ModuleComponentSelector )
 					{
+						p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
 						// tweak remote dependencie resolution
-						if ( requested.group.matches("${groupPath}.*") ) {
-							def path = moduleToProject(requested.getDisplayName())
+						if ( requested.group.matches("${groupPathBase}.*") ) {
+							def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
+							p("path=${path}")
 							def prj = rootProject.findProject(path)
 							for(Task t : project.tasks) {
 								if ( t.getName().equals("projects") || t.getName().equals("tasks") ) { continue }
@@ -124,10 +126,7 @@ if ( rootProject.hasProperty('buildFromLocal') ) {
 									rootAssemble.mustRunAfter childAssemble
 								} catch(Exception e) {}
 							}
-							def explain = "Substitute ${requested.getDisplayName()} to ${prj} because we test"
-							if ( System.env.DEBUG ) {
-								println "DependencySubstitution: ${explain}"
-							}
+							p("Substitute ${requested.getDisplayName()} to ${prj} because we test")
 							dependency.useTarget(prj, "${explain}")
 						}
 					}
