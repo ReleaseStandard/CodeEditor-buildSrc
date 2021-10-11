@@ -36,23 +36,30 @@ buildscript {
 // Setup root project
 //
 ext.set("groupPath","io.github.${githubOwner}.CodeEditor")
-group = groupPath
 
 apply plugin: "net.thauvin.erik.gradle.semver"
+
+group = "${getName()}".replace("CodeEditor","")
 
 def doesTaskNeedManifold(name) {
     return name.contains("Test") && !name.contains("Fixtures")
 }
 def usePlugin(project, plugin) {
-	if ( System.env.USE_LOCAL_BUILDSRC ) {
-                project.apply from: "${rootDir.getPath()}/buildSrc/outputs/build/${plugin}"
-	} else {
-		project.apply from: "https://raw.githubusercontent.com/${githubOwner}/CodeEditor-buildSrc/master/outputs/build/${plugin}"
-	}
+    if ( System.env.USE_LOCAL_BUILDSRC ) {
+        project.apply from: "${rootDir.getPath()}/buildSrc/outputs/build/${plugin}"
+    } else {
+        project.apply from: "https://raw.githubusercontent.com/${githubOwner}/CodeEditor-buildSrc/master/outputs/build/${plugin}"
+    }
 }
 allprojects { Project p ->
 
-        p.group = "${rootProject.group}.${p.getName()}"; // valid only if the first iteration of this is the rootProject
+        // forbid extra CodeEditor prefix
+        p.group = p.group.replaceAll("CodeEditor","")
+        p.group = p.group.replaceAll(/\.$/,"")
+
+        // create the correct group string
+        p.group = "${groupPath}${p.group}"
+        p.group = p.group.replaceAll(/\.$/,"")
 
         repositories buildScriptRepos
         usePlugin(p, "embed.gradle")
