@@ -100,9 +100,6 @@ project.ext.set("projectR",{ String path ->
 	projectR(path)
 })
 
-
-
-
 if ( rootProject.hasProperty('buildFromLocal') ) {
 	configurations {
 		all {

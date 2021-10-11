@@ -52,20 +52,6 @@ configurations {
     implementation.extendsFrom(universalEmbed)
 }
 
-/*
-TODO : define a function for the build from local system that is called each time we need
-    if ( rootProject.hasProperty('buildFromLocal') ) {
-if (selector instanceof ProjectDependency) {
-    selector = selector.getDependencyProject()
-}
-if (selector instanceof String) {
-    if ( selector.matches("${groupPath}.*") ) {
-        selector = rootProject.findProject(moduleToProject(selector))
-    }
-}
-p("The selector has been translated to local dependency : ${selector}")
-}
-*/
 afterEvaluate {
 
     configurations.universalEmbed.dependencies.with {
