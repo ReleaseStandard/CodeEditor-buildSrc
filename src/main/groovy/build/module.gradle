@@ -109,3 +109,7 @@ usePlugin(project, "packaging.gradle")
 usePlugin(project, "newVersion.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 
+// for local customization
+if ( (new File('module.gradle')).exists() ) {
+    apply from: 'module.gradle'
+}
