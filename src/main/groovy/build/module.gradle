@@ -35,7 +35,8 @@ buildscript {
 //
 // Setup root project
 //
-group = "io.github.${githubOwner}.CodeEditor"
+ext.set("groupPath","io.github.${githubOwner}.CodeEditor")
+group = groupPath
 
 apply plugin: "net.thauvin.erik.gradle.semver"
 
@@ -50,6 +51,9 @@ def usePlugin(project, plugin) {
 	}
 }
 allprojects { Project p ->
+
+        p.group = "${rootProject.group}.${p.getName()}"; // valid only if the first iteration of this is the rootProject
+
         repositories buildScriptRepos
         usePlugin(p, "embed.gradle")
         usePlugin(p, "build.helper.gradle")

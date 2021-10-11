@@ -29,12 +29,11 @@ def getProjectPath(obj) {
 
 // produce project path from the moduleString
 def moduleToProject(moduleString) {
-  def trgGroup = "io.github.${githubOwner}.CodeEditor"
   def parts = moduleString.split(":")
   def group = parts[0]
   def module = parts[1]
   def version = parts[2]
-  def remainPart = group.replace(trgGroup,"")
+  def remainPart = group.replace("${groupPath}","")
   remainPart = remainPart.replace(".",":")
   def path = remainPart + ":${module}"
   return path

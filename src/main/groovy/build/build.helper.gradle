@@ -73,8 +73,7 @@ if ( rootProject.hasProperty('buildFromLocal') ) {
 					else if ( requested instanceof ModuleComponentSelector )
 					{
 						// tweak remote dependencie resolution
-						def trgGroup = "io.github.${githubOwner}.CodeEditor"
-						if ( requested.group.matches("${trgGroup}.*") ) {
+						if ( requested.group.matches("${groupPath}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)
 							for(Task t : project.tasks) {

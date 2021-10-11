@@ -120,22 +120,17 @@ allprojects { Project p ->
 							}
 						}
 
-						def artifactGroup = "io.github.${githubOwner}.CodeEditor"
-						if ( thisProject != p ) {
-							artifactGroup += ".${thisProject.name.replace('CodeEditor-', '')}"
-						}
-						def pname = p.name.replace("CodeEditor-","")
 						pom {
-							groupId = artifactGroup
-							artifactId = pname
-							name = pname
+							groupId = "${p.group}"
+							artifactId = p.name
+							name = p.name
 							packaging = 'aar'
-							description = "${pname} for CodeEditor"
-							url = "https://github.com/${githubOwner}/${p.name}"
+							description = "${p.name} for CodeEditor"
+							url = "https://github.com/${githubOwner}/CodeEditor-${p.name}"
 							scm {
-							       connection = "scm:git:github.com/${githubOwner}/${p.name}.git"
-							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/${p.name}.git"
-							       url = "https://github.com/${githubOwner}/${p.name}"
+							       connection = "scm:git:github.com/${githubOwner}/CodeEditor-${p.name}.git"
+							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/CodeEditor-${p.name}.git"
+							       url = "https://github.com/${githubOwner}/CodeEditor-${p.name}"
 							}
 							developers {
 							       developer {

@@ -13,8 +13,7 @@ def universalEmbed(selector) {
             selector = selector.getDependencyProject()
         }
         if (selector instanceof String) {
-            def trgGroup = "io.github.${githubOwner}.CodeEditor"
-            if ( selector.matches("${trgGroup}.*") ) {
+            if ( selector.matches("${groupPath}.*") ) {
                 selector = rootProject.findProject(moduleToProject(selector))
             }
         }

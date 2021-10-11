@@ -29,12 +29,11 @@ def getProjectPath(obj) {
 
 // produce project path from the moduleString
 def moduleToProject(moduleString) {
-  def trgGroup = "io.github.${githubOwner}.CodeEditor"
   def parts = moduleString.split(":")
   def group = parts[0]
   def module = parts[1]
   def version = parts[2]
-  def remainPart = group.replace(trgGroup,"")
+  def remainPart = group.replace("${groupPath}","")
   remainPart = remainPart.replace(".",":")
   def path = remainPart + ":${module}"
   return path
@@ -115,8 +114,7 @@ if ( rootProject.hasProperty('buildFromLocal') ) {
 					else if ( requested instanceof ModuleComponentSelector )
 					{
 						// tweak remote dependencie resolution
-						def trgGroup = "io.github.${githubOwner}.CodeEditor"
-						if ( requested.group.matches("${trgGroup}.*") ) {
+						if ( requested.group.matches("${groupPath}.*") ) {
 							def path = moduleToProject(requested.getDisplayName())
 							def prj = rootProject.findProject(path)
 							for(Task t : project.tasks) {

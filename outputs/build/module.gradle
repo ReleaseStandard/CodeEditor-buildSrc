@@ -29,12 +29,11 @@ def getProjectPath(obj) {
 
 // produce project path from the moduleString
 def moduleToProject(moduleString) {
-  def trgGroup = "io.github.${githubOwner}.CodeEditor"
   def parts = moduleString.split(":")
   def group = parts[0]
   def module = parts[1]
   def version = parts[2]
-  def remainPart = group.replace(trgGroup,"")
+  def remainPart = group.replace("${groupPath}","")
   remainPart = remainPart.replace(".",":")
   def path = remainPart + ":${module}"
   return path
@@ -77,7 +76,8 @@ buildscript {
 //
 // Setup root project
 //
-group = "io.github.${githubOwner}.CodeEditor"
+ext.set("groupPath","io.github.${githubOwner}.CodeEditor")
+group = groupPath
 
 apply plugin: "net.thauvin.erik.gradle.semver"
 
@@ -92,6 +92,9 @@ def usePlugin(project, plugin) {
 	}
 }
 allprojects { Project p ->
+
+        p.group = "${rootProject.group}.${p.getName()}"; // valid only if the first iteration of this is the rootProject
+
         repositories buildScriptRepos
         usePlugin(p, "embed.gradle")
         usePlugin(p, "build.helper.gradle")
