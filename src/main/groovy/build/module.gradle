@@ -39,7 +39,7 @@ ext.set("groupPath","io.github.${githubOwner}.CodeEditor")
 
 apply plugin: "net.thauvin.erik.gradle.semver"
 
-group = "${getName()}".replace("CodeEditor","")
+group = "${getName()}".replace("${rootProject.name}","")
 
 def doesTaskNeedManifold(name) {
     return name.contains("Test") && !name.contains("Fixtures")
@@ -60,6 +60,7 @@ allprojects { Project p ->
         // create the correct group string
         p.group = "${groupPath}${p.group}"
         p.group = p.group.replaceAll(/\.$/,"")
+        p.group = p.group.replaceAll(/\.\./,".")
 
         repositories buildScriptRepos
         usePlugin(p, "embed.gradle")
