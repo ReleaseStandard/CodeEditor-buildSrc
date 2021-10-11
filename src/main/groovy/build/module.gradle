@@ -9,7 +9,7 @@
 buildscript {
         ext["buildScriptRepos"] = {
                 flatDir {
-                        dirs 'libs'
+                    dirs "${rootDir.getAbsolutePath()}/libs"
                 }
                 google()
                 mavenCentral()
