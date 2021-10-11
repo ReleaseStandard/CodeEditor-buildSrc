@@ -151,7 +151,7 @@ afterEvaluate {
 				Project targetProject = dependency.dependencyProject
 				if ( targetProject != project ) {
 					p "resolve dependency : ${dependency} for ${project}($c)"
-					Class[] taskTypes = [SourceTask.class, Delete.class]
+					Class[] taskTypes = [SourceTask.class, Delete.class, AbstractTestTask.class, Test.class]
 					for(Class taskType : taskTypes) {
 						for (Task rootTask : tasks.withType(taskType)) {
 							Task childTask = targetProject.tasks.findByName(rootTask.getName())
