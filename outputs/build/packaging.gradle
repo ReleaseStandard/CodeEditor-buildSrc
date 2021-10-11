@@ -151,13 +151,16 @@ afterEvaluate {
 				Project targetProject = dependency.dependencyProject
 				if ( targetProject != project ) {
 					p "resolve dependency : ${dependency} for ${project}($c)"
-					for (Task rootTask : tasks.withType(JavaCompile)) {
-						Task childTask = targetProject.tasks.findByName(rootTask.getName())
-						if (childTask == null) {
-							continue;
+					Class[] taskTypes = [SourceTask.class, Delete.class]
+					for(Class taskType : taskTypes) {
+						for (Task rootTask : tasks.withType(taskType)) {
+							Task childTask = targetProject.tasks.findByName(rootTask.getName())
+							if (childTask == null) {
+								continue;
+							}
+							rootTask.dependsOn childTask
+							rootTask.mustRunAfter childTask
 						}
-						rootTask.dependsOn childTask
-						rootTask.mustRunAfter childTask
 					}
 				}
 			}
