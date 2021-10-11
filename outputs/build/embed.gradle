@@ -1,3 +1,5 @@
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+
 ext['githubOwner'] = "ReleaseStandard"
 ext['groupPathBase'] = "io.github.${githubOwner}.CodeEditor"
 
@@ -45,59 +47,55 @@ def moduleToProject(moduleString) {
 // Used to provide universalEmbed configuration property
 //  - shadow for java library projects (jar)
 //  - fat-aar for android library projects
-
 configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
 }
 
+/*
+TODO : define a function for the build from local system that is called each time we need
+    if ( rootProject.hasProperty('buildFromLocal') ) {
+if (selector instanceof ProjectDependency) {
+    selector = selector.getDependencyProject()
+}
+if (selector instanceof String) {
+    if ( selector.matches("${groupPath}.*") ) {
+        selector = rootProject.findProject(moduleToProject(selector))
+    }
+}
+p("The selector has been translated to local dependency : ${selector}")
+}
+*/
 afterEvaluate {
+
+    configurations.universalEmbed.dependencies.with {
+        for (Dependency dependency : it) {
+            if (dependency instanceof DefaultProjectDependency) {
+                Project targetProject = dependency.getDependencyProject()
+                for(Task rootTask : project.tasks.withType(JavaCompile)) {
+                    p("${rootTask} search into project ${targetProject}")
+                    Task childTask = targetProject.tasks.findByName(rootTask.getName())
+                    if ( childTask == null ) { continue; }
+                    p("${rootTask} -> ${childTask}")
+                    rootTask.dependsOn childTask
+                    rootTask.mustRunAfter childTask
+                }
+            }
+        }
+    }
 
     configurations.universalEmbed.collect {
         p("Add artifact ${it} to ${project}")
-        def _it = it
-
-        // Add tasks propagation : we must (compile project(':model'))
-        /*
-            if ( rootProject.hasProperty('buildFromLocal') ) {
-        if (selector instanceof ProjectDependency) {
-            selector = selector.getDependencyProject()
-        }
-        if (selector instanceof String) {
-            if ( selector.matches("${groupPath}.*") ) {
-                selector = rootProject.findProject(moduleToProject(selector))
-            }
-        }
-        p("The selector has been translated to local dependency : ${selector}")
-    }
-         */
-
         if (plugins.hasPlugin("java-library")) {
             p("Need to add ${it} to ${project} a java-library(jar)")
-            jar {
-                from {
-                    _it.isDirectory() ? _it : zipTree(_it).matching {
-                        exclude "module-info.*"
-                    }
-                }
-            }
+            apply plugin: 'com.github.johnrengelman.shadow'
+            configurations.shadow.extendsFrom(configurations.universalEmbed)
         } else if ( plugins.hasPlugin('com.android.library')) {
             p("Need to add ${it} to ${project} a com.android.library(aar)")
             apply plugin: 'com.kezong.fat-aar'
             fataar {
                 transitive = true
             }
-            /*if ( rootProject.hasProperty('buildFromLocal') ) {
-                if ( selector instanceof Project ) {
-                    selector.afterEvaluate {
-                        if ( !selector.plugins.hasPlugin("com.android.library")) {
-                            p "${project} -> ${selector} don't have the plugin"
-                            p "Due to a limitation of fat-aar we must correct that here"
-                            dependencies.implementation selector
-                        }
-                    }
-                }
-            }*/
             configurations.embed.extendsFrom(configurations.universalEmbed)
         } else {
             p("Embed has failed : unknow form")

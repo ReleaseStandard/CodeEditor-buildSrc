@@ -134,9 +134,9 @@ if ( (new File(viewFile)).exists() ) {
 }
 beforeEvaluate {
 // include all subprojects into this node project
-	for (Project p : project.subprojects) {
+	for (Project p : subprojects) {
 		if (!isAview(p)) {
-			project.dependencies.universalEmbed p
+			dependencies.universalEmbed p
 		}
 	}
 }
