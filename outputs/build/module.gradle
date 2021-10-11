@@ -152,6 +152,7 @@ usePlugin(project, "newVersion.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 
 // for local customization
-if ( (new File('module.gradle')).exists() ) {
-    apply from: 'module.gradle'
+def plugFile = "${projectDir.getAbsolutePath()}/module.gradle"
+if ( (new File("${plugFile}")).exists() ) {
+    apply from: "${plugFile}"
 }
