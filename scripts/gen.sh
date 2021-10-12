@@ -9,8 +9,6 @@ Osettings="${O}/settings/"
 Isettings="${g}/settings/"
 Obuild="${O}/build/"
 Ibuild="${g}/build/"
-o=modules.gradle
-o2=root.gradle
 
 VAR=""
 function configure() {
@@ -35,17 +33,9 @@ function apply3() {
 }
 mkdir -p "$O"
 
-configure "$Osettings/$o"
-apply2 "// All modules (CodeEditor modules) must have the same settings in entry"
-apply2 "// this script play this role"
-apply2 ""
-apply3 lib common modules
-
-
-configure "$Osettings/$o2"
-apply2 "// root project of CodeEditor have common parts with modules so we manage that here"
-apply2 ""
-apply3 lib common root
+configure "$Osettings/autodiscover.gradle"
+apply2 "// Projects are discovered from the directory structure, nothing to do"
+apply3 lib common
 
 for f in $(ls ${g}/build/*) ; do
 	file="${f/*\//}"

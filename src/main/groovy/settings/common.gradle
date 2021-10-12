@@ -11,9 +11,7 @@ rootDir.eachDirRecurse { dir ->
 def makeInclude(dir) {
 
   def remainPart = getRemainingPart(dir)
-  if ( System.env.DEBUG ) {
-    println "remainPart=${remainPart}"
-  }
+  p "remainPart=${remainPart}"
   include("${remainPart}")
   project("${remainPart}").projectDir = file(getProjectPath(dir))
 

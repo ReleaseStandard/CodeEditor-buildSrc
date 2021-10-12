@@ -1,5 +1,4 @@
-// root project of CodeEditor have common parts with modules so we manage that here
-
+// Projects are discovered from the directory structure, nothing to do
 // src/main/groovy//settings//lib.gradle
 ext['githubOwner'] = "ReleaseStandard"
 ext['groupPathBase'] = "io.github.${githubOwner}.CodeEditor"
@@ -56,17 +55,9 @@ rootDir.eachDirRecurse { dir ->
 def makeInclude(dir) {
 
   def remainPart = getRemainingPart(dir)
-  if ( System.env.DEBUG ) {
-    println "remainPart=${remainPart}"
-  }
+  p "remainPart=${remainPart}"
   include("${remainPart}")
   project("${remainPart}").projectDir = file(getProjectPath(dir))
 
 }
 
-// src/main/groovy//settings//root.gradle
-/**
- * 
- * This script define configuration for the root
- * 
- **/

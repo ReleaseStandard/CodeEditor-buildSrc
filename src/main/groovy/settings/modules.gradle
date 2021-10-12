@@ -1,8 +1,0 @@
-/**
- *
- * This script provide allow complication of plugins in their own tree
- *
- *
- */
-
-p "Loaded (rootDir="+rootDir+") ..."
