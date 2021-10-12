@@ -39,17 +39,24 @@ def resolveRelativePath(path) {
  * @param path
  * @return
  */
-def projectR(path) {
+def projectR(path,obj) {
 	def resolvedPath = resolveRelativePath(path)
 	p "projectR : resolvedPath = ${resolvedPath}"
-	return project(resolvedPath)
+	if ( obj == null ) {
+		return project(resolvedPath)
+	} else if ( obj instanceof Closure ) {
+		return project(resolvedPath, obj)
+	} else {
+		println "obj="+obj.getClass() + " not understood by projectR"
+		System.exit(1)
+	}
 }
-
-project.ext.set("projectR",{ String path ->
-	projectR(path)
+ext.set("projectRA",{ String path, Closure closure ->
+	projectR(path, closure)
 })
-
-
+ext.set("projectR",{ String path ->
+	projectR(path, null)
+})
 
 configurations {
 	all {
