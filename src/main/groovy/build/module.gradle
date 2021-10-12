@@ -63,7 +63,7 @@ allprojects { Project p ->
 
     repositories buildScriptRepos
     usePlugin(p, "embed.gradle")
-    usePlugin(p, "build.helper.gradle")
+    usePlugin(p, "liveModifications.gradle")
     p.apply plugin: 'jacoco'
 
     try {
@@ -104,7 +104,7 @@ allprojects { Project p ->
     }
 }
 
-usePlugin(project, "packaging.gradle")
+usePlugin(project, "mvcPackaging.gradle")
 usePlugin(project, "newVersion.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 

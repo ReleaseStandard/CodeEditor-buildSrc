@@ -31,7 +31,7 @@ function apply2() {
 function apply3() {
 	for f in "$@" ; do apply "${Isettings}/${f}" ; done
 }
-mkdir -p "$O"
+mkdir -p "$Obuild" "$Osettings"
 
 configure "$Osettings/autodiscover.gradle"
 apply2 "// Projects are discovered from the directory structure, nothing to do"
