@@ -57,6 +57,17 @@ afterEvaluate {
         if (plugins.hasPlugin("java-library")) {
             p("Need to add ${it} to ${project} a java-library(jar)")
             apply plugin: 'com.github.johnrengelman.shadow'
+            for(Task t :tasks.withType(Jar)) {
+                if ( t != shadowJar && t.getName().equals("jar") ) {
+                    t.archiveClassifier.set('onlyView')
+                    p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
+                    t.mustRunAfter shadowJar
+                    t.dependsOn shadowJar
+                }
+            }
+            shadowJar {
+                archiveClassifier.set('')
+            }
             configurations.shadow.extendsFrom(configurations.universalEmbed)
         } else if ( plugins.hasPlugin('com.android.library')) {
             p("Need to add ${it} to ${project} a com.android.library(aar)")
