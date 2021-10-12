@@ -75,19 +75,31 @@ def resolveRelativePath(path) {
  */
 def projectR(path,obj) {
     def resolvedPath = resolveRelativePath(path)
+    def prj = null
+    def v = "${version}"
     p "projectR : resolvedPath = ${resolvedPath}"
     if ( obj == null ) {
-        return project(resolvedPath)
+        prj = project(resolvedPath)
     } else if ( obj instanceof Closure ) {
-        return project(resolvedPath, obj)
+        prj = project(resolvedPath, obj)
+    } else if ( obj instanceof String || obj instanceof GString ) {
+        prj = project(resolvedPath)
+        v = "${obj}"
+        // todo : by default put the version name
+        if ( v!= null && v != "unspecified" ) {
+            println "v=${v}"
+            prj.setVersion("${v}")
+            //prj["version"] = "${v}"
+        }
     } else {
         println "obj="+obj.getClass() + " not understood by projectR"
         System.exit(1)
     }
+    return prj
 }
 
-ext.set("projectRA",{ String path, Closure closure ->
-    projectR(path, closure)
+ext.set("projectRA",{ String path, obj ->
+    projectR(path, obj)
 })
 ext.set("projectR",{ String path ->
     projectR(path, null)
