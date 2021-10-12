@@ -94,14 +94,16 @@ def usePlugin(project, plugin) {
 }
 allprojects { Project p ->
 
-    // forbid extra CodeEditor prefix
-    p.group = p.group.replaceAll("CodeEditor","")
-    p.group = p.group.replaceAll(/\.$/,"")
+    if ( !p.group.matches("${groupPathBase}.*") ) {
+        // forbid extra CodeEditor prefix
+        p.group = p.group.replaceAll("CodeEditor", "")
+        p.group = p.group.replaceAll(/\.$/, "")
 
-    // create the correct group string
-    p.group = "${groupPathBase}${p.group}"
-    p.group = p.group.replaceAll(/\.$/,"")
-    p.group = p.group.replaceAll(/\.\./,".")
+        // create the correct group string
+        p.group = "${groupPathBase}.${p.group}"
+        p.group = p.group.replaceAll(/\.$/, "")
+        p.group = p.group.replaceAll(/\.\./, ".")
+    }
 
     repositories buildScriptRepos
     usePlugin(p, "embed.gradle")
