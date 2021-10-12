@@ -50,11 +50,24 @@ configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
 }
-setVersion(version)
+
 afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
+        project.task("jar", type: Jar, overwrite: true) {
+            doLast {
+                p "this end"
+                for(TaskOutputs outs : shadowJar.outputs) {
+                    for(File f : outs.files) {
+                        def dest = f.parent+"/"+f.getName().replace("-" + shadowJar.getArchiveClassifier().get(),"")
+                        p "this dest : " + dest
+                        p "this : ${f.getAbsolutePath()}"
+                        f.renameTo(new File(dest))
+                    }
+                }
+            }
+        }
         for (Task t : tasks.withType(Jar)) {
             if (t != shadowJar && t.getName().equals("jar")) {
                 p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
