@@ -135,12 +135,17 @@ if ( (new File(viewFile)).exists() ) {
 
 // include all subprojects into this node project
 //  - embed all projects into the main (behaviour of individual projects)
-for (Project prj : subprojects) {
-	p("found subprojects : ${prj}")
-	if (!isAview(prj)) {
-		p("embed ${prj} into ${project}")
-		dependencies.universalEmbed prj
+//  - since some project cause trouble, we do not embed them
+String [] whitelist = [ "editor", "languages", "logger-debug" ]
+for(String w : whitelist) {
+	if (project.name.equals(w)) {
+		for (Project prj : subprojects) {
+			p("found subprojects : ${prj}")
+			if (!isAview(prj)) {
+				p("embed ${prj} into ${project}")
+				dependencies.universalEmbed prj
+			}
+		}
 	}
 }
-
 // END
