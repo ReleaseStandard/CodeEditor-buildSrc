@@ -58,7 +58,7 @@ buildscript {
                 jcenter() // Warning: this repository is going to shut down soon
                 maven { url = 'https://jitpack.io' }
 	        maven { url = 'https://s01.oss.sonatype.org/content/groups/public/' }
-                maven { url = "https://plugins.gradle.org/m2/" }
+                gradlePluginPortal()
         }
         ext["buildScriptDep"] = {
                 classpath "com.android.tools.build:gradle:4.2.1"
