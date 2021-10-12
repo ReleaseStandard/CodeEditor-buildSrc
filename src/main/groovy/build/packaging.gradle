@@ -109,9 +109,19 @@ afterEvaluate {
 				Project targetProject = dependency.dependencyProject
 				if ( targetProject != project ) {
 					p "resolve dependency : ${dependency} for ${project}($c)"
-					Class[] taskTypes = [SourceTask.class, Delete.class, AbstractTestTask.class, Test.class]
-					for(Class taskType : taskTypes) {
-						for (Task rootTask : tasks.withType(taskType)) {
+					Object[] taskTypes = [SourceTask.class, Delete.class, AbstractTestTask.class, Test.class, "test"]
+					for(Object taskType : taskTypes) {
+						Object collection
+						if ( taskType instanceof Class ) {
+							collection = tasks.withType(taskType)
+						} else if ( taskType instanceof String ) {
+							collection = tasks.getByName(taskType)
+						} else {
+							println "Error unreconized type for taskType " + taskType.getClass()
+							System.exit(1)
+						}
+
+						for (Task rootTask : collection) {
 							Task childTask = targetProject.tasks.findByName(rootTask.getName())
 							if (childTask == null) {
 								continue;
