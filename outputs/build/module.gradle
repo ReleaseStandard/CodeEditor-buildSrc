@@ -77,7 +77,6 @@ buildscript {
 //
 // Setup root project
 //
-ext.set("groupPath","io.github.${githubOwner}.CodeEditor")
 
 apply plugin: "net.thauvin.erik.gradle.semver"
 
@@ -100,7 +99,7 @@ allprojects { Project p ->
     p.group = p.group.replaceAll(/\.$/,"")
 
     // create the correct group string
-    p.group = "${groupPath}${p.group}"
+    p.group = "${groupPathBase}${p.group}"
     p.group = p.group.replaceAll(/\.$/,"")
     p.group = p.group.replaceAll(/\.\./,".")
 

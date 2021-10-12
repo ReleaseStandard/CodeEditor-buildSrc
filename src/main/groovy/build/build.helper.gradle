@@ -3,17 +3,8 @@
 // - implementation relative for projects
 // - change remote to local when property buildFromLocal is set
 //
-def prefix(msg) {
-	return "[TEST]" + msg
-}
-def info(msg) {
-	project.logger.info(prefix(msg))
-}
-def debug(msg) {
-	project.logger.debug(prefix(msg))
-}
 
-info("Script inclusion")
+p("Script inclusion")
 
 /**
  * Relative include for subprojects
