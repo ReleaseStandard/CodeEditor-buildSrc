@@ -146,8 +146,9 @@ allprojects { Project p ->
         }
     }
 }
-
+usePlugin(project, "libMultiLevelUtils.gradle")
 usePlugin(project, "mvcPackaging.gradle")
+usePlugin(project, "multiLevelUtils.gradle")
 usePlugin(project, "newVersion.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 

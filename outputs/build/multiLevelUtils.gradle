@@ -44,58 +44,6 @@ def moduleToProject(moduleString) {
 
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 
-/**
- * Relative include for subprojects
- */
-def resolveRelativePath(path) {
-    def remainPart = getRemainingPart(project)
-    String[] parts = remainPart.split(":")
-    String finalPath = ""
-    for(int a = 0; a < parts.length-1; a=a+1) {
-        if(parts[a].size() > 0 ) {
-            finalPath += ":" + parts[a]
-        }
-    }
-    finalPath += path
-    def p = project.findProject(finalPath)
-    if ( p != null ) {
-        if ( System.env.DEBUG ) { println "resolveRelativePath: finalPath=${finalPath},remainPart=${remainPart},path=${path}" }
-        return finalPath
-    } else {
-        String alternativePath = remainPart + path
-        p = project.findProject(alternativePath)
-        if ( p != null ) {
-            if ( System.env.DEBUG ) { println "resolveRelativePath: alternativePath=${alternativePath},path=${path}" }
-            return alternativePath
-        }
-    }
-    throw new RuntimeException("project with path '${path}' not found")
-}
-
-/**
- * This extends project() function by making it relative.
- * @param path
- * @return
- */
-def projectR(path,obj) {
-    def resolvedPath = resolveRelativePath(path)
-    p "projectR : resolvedPath = ${resolvedPath}"
-    if ( obj == null ) {
-        return project(resolvedPath)
-    } else if ( obj instanceof Closure ) {
-        return project(resolvedPath, obj)
-    } else {
-        println "obj="+obj.getClass() + " not understood by projectR"
-        System.exit(1)
-    }
-}
-ext.set("projectRA",{ String path, Closure closure ->
-    projectR(path, closure)
-})
-ext.set("projectR",{ String path ->
-    projectR(path, null)
-})
-
 // link tasks that need to be
 // (because empty nodes stop the propagation to children projects)
 afterEvaluate {
