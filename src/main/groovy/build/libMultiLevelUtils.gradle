@@ -11,15 +11,15 @@ def resolveRelativePath(path) {
         }
     }
     finalPath += path
-    def p = project.findProject(finalPath)
-    if ( p != null ) {
-        if ( System.env.DEBUG ) { println "resolveRelativePath: finalPath=${finalPath},remainPart=${remainPart},path=${path}" }
+    def prj = project.findProject(finalPath)
+    if ( prj != null ) {
+        p "resolveRelativePath: finalPath=${finalPath},remainPart=${remainPart},path=${path}"
         return finalPath
     } else {
         String alternativePath = remainPart + path
-        p = project.findProject(alternativePath)
-        if ( p != null ) {
-            if ( System.env.DEBUG ) { println "resolveRelativePath: alternativePath=${alternativePath},path=${path}" }
+        prj = project.findProject(alternativePath)
+        if ( prj != null ) {
+            p "resolveRelativePath: alternativePath=${alternativePath},path=${path}"
             return alternativePath
         }
     }

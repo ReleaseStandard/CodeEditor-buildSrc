@@ -126,24 +126,22 @@ def producePublicationTaskName(obj) {
 	return result
 }
 apply plugin: 'maven-publish'
-allprojects { Project p -> 
-	p.afterEvaluate {
-		if ( System.env.DEBUG ) {
-			println ""
-			println ""
-			println "****************************************************"
-			println "thisProject=${thisProject.name},p=${p.name}"
-		}
+allprojects { Project prj ->
+	prj.afterEvaluate {
+		p ""
+		p ""
+		p "****************************************************"
+		p "thisProject=${thisProject.name},prj=${prj.name}"
 
-		if (  ! ( p.plugins.hasPlugin('com.android.library') 
-			|| p.plugins.hasPlugin('java-library') ) ) {
-			println "[WARNING] $p cannot be published to MavenCentral"
+		if (  ! ( prj.plugins.hasPlugin('com.android.library')
+			|| prj.plugins.hasPlugin('java-library') ) ) {
+			println "[WARNING] $prj cannot be published to MavenCentral"
 			return
 		}
 
-		def pubname = producePublicationTaskName(p)
+		def pubname = producePublicationTaskName(prj)
 		try {
-			p.tasks.getByName(getPublicationTaskName("${pubname}"))
+			prj.tasks.getByName(getPublicationTaskName("${pubname}"))
 			println "task " + getPublicationTaskName("${pubname}") + " found for the project ${thisProject.name}"
 		} catch (Exception exception) {
 			thisProject.publishing {
@@ -152,27 +150,27 @@ allprojects { Project p ->
 						artifact sourcesJar
 						artifact javadocJar
 
-						if ( p.plugins.hasPlugin('com.android.library') ) {
-							p.afterEvaluate {
-								from p.components.release
+						if ( prj.plugins.hasPlugin('com.android.library') ) {
+							prj.afterEvaluate {
+								from prj.components.release
 							}
-						} else if ( p.plugins.hasPlugin('java-library') ) {
-							p.afterEvaluate {
-								from p.components.java
+						} else if ( prj.plugins.hasPlugin('java-library') ) {
+							prj.afterEvaluate {
+								from prj.components.java
 							}
 						}
 
 						pom {
-							groupId = "${p.group}"
-							artifactId = p.name
-							name = p.name
+							groupId = "${prj.group}"
+							artifactId = prj.name
+							name = prj.name
 							packaging = 'aar'
-							description = "${p.name} for CodeEditor"
-							url = "https://github.com/${githubOwner}/CodeEditor-${p.name}"
+							description = "${prj.name} for CodeEditor"
+							url = "https://github.com/${githubOwner}/CodeEditor-${prj.name}"
 							scm {
-							       connection = "scm:git:github.com/${githubOwner}/CodeEditor-${p.name}.git"
-							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/CodeEditor-${p.name}.git"
-							       url = "https://github.com/${githubOwner}/CodeEditor-${p.name}"
+							       connection = "scm:git:github.com/${githubOwner}/CodeEditor-${prj.name}.git"
+							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/CodeEditor-${prj.name}.git"
+							       url = "https://github.com/${githubOwner}/CodeEditor-${prj.name}"
 							}
 							developers {
 							       developer {
@@ -198,24 +196,22 @@ allprojects { Project p ->
 				        )
 				        sign thisProject.publishing.publications."${pubname}"
 				}
-				if ( System.env.DEBUG ) {
-					println "mavenCentralPublish: register " + getPublicationTaskName("${pubname}") + " on $thisProject"
-				}
+				p "mavenCentralPublish: register " + getPublicationTaskName("${pubname}") + " on $thisProject"
 				try {
 					// Make that signature task is executed after the reBundleAarRelease //
 					def t = thisProject.tasks.getByName(getPublicationTaskName("${pubname}"))
-					p.afterEvaluate {
-						if ( p.plugins.hasPlugin("com.kezong.fat-aar") ) {
+					prj.afterEvaluate {
+						if ( prj.plugins.hasPlugin("com.kezong.fat-aar") ) {
 							Task ta = null
 							try {
-								ta = p.tasks.getByName("reBundleAarRelease")
+								ta = prj.tasks.getByName("reBundleAarRelease")
 							} catch(Exception e) {}
 							if ( ta != null ) {
 								t.mustRunAfter ta
 							}
 						}
 					}
-				} catch(Exception e) { println "[WARNING] could not provide signature for ${p.name}" }
+				} catch(Exception e) { println "[WARNING] could not provide signature for ${prj.name}" }
 			}
 		}
 	}
