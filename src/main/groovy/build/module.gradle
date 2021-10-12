@@ -106,7 +106,7 @@ allprojects { Project p ->
 usePlugin(project, "libMultiLevelUtils.gradle")
 usePlugin(project, "mvcPackaging.gradle")
 usePlugin(project, "multiLevelUtils.gradle")
-usePlugin(project, "newVersion.gradle")
+usePlugin(project, "versionning.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 
 // for local customization
