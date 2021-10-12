@@ -64,6 +64,7 @@ allprojects { Project p ->
     repositories buildScriptRepos
     usePlugin(p, "embed.gradle")
     usePlugin(p, "liveModifications.gradle")
+    usePlugin(p, "multiLevelUtils.gradle")
     p.apply plugin: 'jacoco'
 
     try {
