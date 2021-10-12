@@ -93,11 +93,11 @@ if ( (new File(viewFile)).exists() ) {
 }
 
 // include all subprojects into this node project
-beforeEvaluate {
-	for (Project p : subprojects) {
-		if (!isAview(p)) {
-			dependencies.universalEmbed p
-		}
+for (Project prj : subprojects) {
+	p("found subprojects : ${prj}")
+	if (!isAview(prj)) {
+		p("embed ${prj} into ${project}")
+		dependencies.universalEmbed prj
 	}
 }
 
