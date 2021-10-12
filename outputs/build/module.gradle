@@ -95,56 +95,56 @@ def usePlugin(project, plugin) {
 }
 allprojects { Project p ->
 
-        // forbid extra CodeEditor prefix
-        p.group = p.group.replaceAll("CodeEditor","")
-        p.group = p.group.replaceAll(/\.$/,"")
+    // forbid extra CodeEditor prefix
+    p.group = p.group.replaceAll("CodeEditor","")
+    p.group = p.group.replaceAll(/\.$/,"")
 
-        // create the correct group string
-        p.group = "${groupPath}${p.group}"
-        p.group = p.group.replaceAll(/\.$/,"")
-        p.group = p.group.replaceAll(/\.\./,".")
+    // create the correct group string
+    p.group = "${groupPath}${p.group}"
+    p.group = p.group.replaceAll(/\.$/,"")
+    p.group = p.group.replaceAll(/\.\./,".")
 
-        repositories buildScriptRepos
-        usePlugin(p, "embed.gradle")
-        usePlugin(p, "build.helper.gradle")
-        p.apply plugin: 'jacoco'
+    repositories buildScriptRepos
+    usePlugin(p, "embed.gradle")
+    usePlugin(p, "build.helper.gradle")
+    p.apply plugin: 'jacoco'
 
-        try {
-            if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-               if (sourceSets.main.allJava.files.any { it.name == "module-info.java" }) {
-                    tasks.withType(JavaCompile) {
-                        if ( doesTaskNeedManifold(getName()) ) {
-                                // If you DO define a module-info.java file:
-                                options.compilerArgs += ['-Xplugin:Manifold', '--module-path', it.classpath.asPath]
-                        }
-                   }
-               }
-           } else {
-                throw new RuntimeException();
-           }
-        } catch(Exception e) {
-           p.tasks.withType(JavaCompile) {
-                if ( doesTaskNeedManifold(getName()) ) {
-                        // If you DO NOT define a module-info.java file:
-                        options.compilerArgs += ['-Xplugin:Manifold']
+    try {
+        if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+            if (sourceSets.main.allJava.files.any { it.name == "module-info.java" }) {
+                tasks.withType(JavaCompile) {
+                    if ( doesTaskNeedManifold(getName()) ) {
+                        // If you DO define a module-info.java file:
+                        options.compilerArgs += ['-Xplugin:Manifold', '--module-path', it.classpath.asPath]
+                    }
                 }
             }
-       }
+        } else {
+            throw new RuntimeException();
+        }
+    } catch(Exception e) {
+        p.tasks.withType(JavaCompile) {
+            if ( doesTaskNeedManifold(getName()) ) {
+                // If you DO NOT define a module-info.java file:
+                options.compilerArgs += ['-Xplugin:Manifold']
+            }
+        }
+    }
 
-       p.afterEvaluate {
-               p.dependencies {
-                        testImplementation 'junit:junit:4.+'
+    p.afterEvaluate {
+        p.dependencies {
+            testImplementation 'junit:junit:4.+'
 
-                       // jail break and joo
-                       testImplementation 'systems.manifold:manifold-json-rt:2021.1.14'
-                       testImplementation 'systems.manifold:manifold-props-rt:2021.1.14'
-                       testImplementation 'systems.manifold:manifold-ext:2021.1.14'
-                       testImplementation 'systems.manifold:manifold-rt:2021.1.14'
-                       annotationProcessor 'systems.manifold:manifold-json:2021.1.14'
-                       annotationProcessor 'systems.manifold:manifold-props:2021.1.14'
-                       annotationProcessor 'systems.manifold:manifold-ext:2021.1.14'
-               }
-       }
+            // jail break and joo
+            testImplementation 'systems.manifold:manifold-json-rt:2021.1.14'
+            testImplementation 'systems.manifold:manifold-props-rt:2021.1.14'
+            testImplementation 'systems.manifold:manifold-ext:2021.1.14'
+            testImplementation 'systems.manifold:manifold-rt:2021.1.14'
+            annotationProcessor 'systems.manifold:manifold-json:2021.1.14'
+            annotationProcessor 'systems.manifold:manifold-props:2021.1.14'
+            annotationProcessor 'systems.manifold:manifold-ext:2021.1.14'
+        }
+    }
 }
 
 usePlugin(project, "packaging.gradle")

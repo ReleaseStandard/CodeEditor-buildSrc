@@ -8,6 +8,7 @@
 def vtype = ""
 ext["VIEW_PREFIX"] = "view-"
 import org.apache.tools.ant.DirectoryScanner
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
 
 // list view supported by this project
 def getSupportedViews() {
@@ -60,16 +61,16 @@ if ( (new File(viewFile)).exists() ) {
 		android.sourceSets {
 			main {
 				manifest.srcFile "${folder}/src/main/AndroidManifest.xml"
-		        java.srcDirs = ["${folder}/src/main/java"]
-		        res.srcDirs = ["${folder}/src/main/res"]
+				java.srcDirs = ["${folder}/src/main/java"]
+				res.srcDirs = ["${folder}/src/main/res"]
 			}
 		}
 		android.packagingOptions {
 			exclude "**/module-info.class"
 		}
 		android.compileOptions {
-            sourceCompatibility javaVersion
-            targetCompatibility javaVersion
+			sourceCompatibility javaVersion
+			targetCompatibility javaVersion
 		}
 		android.defaultConfig.versionCode semver.minor
 		android.defaultConfig.versionName "${version}"
@@ -90,10 +91,38 @@ if ( (new File(viewFile)).exists() ) {
 } else {
 	apply plugin: 'java-library'
 }
+
 // include all subprojects into this node project
-for(Project p : project.subprojects) {
-	if ( ! isAview(p) ) {
-		universalEmbed p
+beforeEvaluate {
+	for (Project p : subprojects) {
+		if (!isAview(p)) {
+			dependencies.universalEmbed p
+		}
+	}
+}
+
+// link tasks that need to be
+afterEvaluate {
+	configurations.all { Configuration c ->
+		c.dependencies.all { Dependency dependency ->
+			if (dependency instanceof DefaultProjectDependency) {
+				Project targetProject = dependency.dependencyProject
+				if ( targetProject != project ) {
+					p "resolve dependency : ${dependency} for ${project}($c)"
+					Class[] taskTypes = [SourceTask.class, Delete.class, AbstractTestTask.class, Test.class]
+					for(Class taskType : taskTypes) {
+						for (Task rootTask : tasks.withType(taskType)) {
+							Task childTask = targetProject.tasks.findByName(rootTask.getName())
+							if (childTask == null) {
+								continue;
+							}
+							rootTask.dependsOn childTask
+							rootTask.mustRunAfter childTask
+						}
+					}
+				}
+			}
+		}
 	}
 }
 

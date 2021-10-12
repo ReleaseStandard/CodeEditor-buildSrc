@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
-
 ext['githubOwner'] = "ReleaseStandard"
 ext['groupPathBase'] = "io.github.${githubOwner}.CodeEditor"
 
@@ -47,6 +45,7 @@ def moduleToProject(moduleString) {
 // Used to provide universalEmbed configuration property
 //  - shadow for java library projects (jar)
 //  - fat-aar for android library projects
+
 configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
