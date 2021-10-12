@@ -85,15 +85,15 @@ def projectR(path,obj) {
     } else if ( obj instanceof String || obj instanceof GString ) {
         prj = project(resolvedPath)
         v = "${obj}"
-        // todo : by default put the version name
-        if ( v!= null && v != "unspecified" ) {
-            println "v=${v}"
-            prj.setVersion("${v}")
-            //prj["version"] = "${v}"
-        }
     } else {
         println "obj="+obj.getClass() + " not understood by projectR"
         System.exit(1)
+    }
+    // todo : by default put the version name
+    if ( v!= null && v != "unspecified" ) {
+        println "v=${v}"
+        //prj.setVersion("${v}")
+        //prj["version"] = "${v}"
     }
     return prj
 }

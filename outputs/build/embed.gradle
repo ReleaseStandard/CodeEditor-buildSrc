@@ -50,21 +50,17 @@ configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
 }
-
+setVersion(version)
 afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
         for (Task t : tasks.withType(Jar)) {
             if (t != shadowJar && t.getName().equals("jar")) {
-                t.archiveClassifier.set('onlyView')
                 p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
                 t.mustRunAfter shadowJar
                 t.dependsOn shadowJar
             }
-        }
-        shadowJar {
-            archiveClassifier.set('')
         }
         configurations.shadow.extendsFrom(configurations.universalEmbed)
     } else if ( plugins.hasPlugin('com.android.library')) {
