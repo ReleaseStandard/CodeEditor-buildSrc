@@ -1,0 +1,42 @@
+ext['githubOwner'] = "ReleaseStandard"
+ext['groupPathBase'] = "io.github.${githubOwner}.CodeEditor"
+
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+	}
+}
+
+// deduce the remaining part from an entry object
+def getRemainingPart(dir) {
+  def remainPart = ""
+  def projectDirectory = getProjectPath(dir)
+  def rootProjectDirectory = rootDir.getPath()
+  remainPart = projectDirectory.replace(rootProjectDirectory,"")
+  remainPart = remainPart.replaceAll("/",":")
+  return remainPart
+}
+
+def getProjectPath(obj) {
+  if ( obj instanceof Project ) {
+    return obj.projectDir.getPath()
+  }
+  if ( obj instanceof File ) {
+      return obj.getPath()
+  }
+  return obj	
+}
+
+// produce project path from the moduleString
+def moduleToProject(moduleString) {
+  def parts = moduleString.split(":")
+  def group = parts[0]
+  def module = parts[1]
+  def version = parts[2]
+  def remainPart = group.replace("${groupPathBase}","")
+  remainPart = remainPart.replace(".",":")
+  def path = remainPart + ":${module}"
+  return path
+}
+

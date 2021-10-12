@@ -1,0 +1,133 @@
+ext['githubOwner'] = "ReleaseStandard"
+ext['groupPathBase'] = "io.github.${githubOwner}.CodeEditor"
+
+def p(msg) {
+	def debug = System.env.DEBUG
+	if ( debug ) {
+		println msg
+	}
+}
+
+// deduce the remaining part from an entry object
+def getRemainingPart(dir) {
+  def remainPart = ""
+  def projectDirectory = getProjectPath(dir)
+  def rootProjectDirectory = rootDir.getPath()
+  remainPart = projectDirectory.replace(rootProjectDirectory,"")
+  remainPart = remainPart.replaceAll("/",":")
+  return remainPart
+}
+
+def getProjectPath(obj) {
+  if ( obj instanceof Project ) {
+    return obj.projectDir.getPath()
+  }
+  if ( obj instanceof File ) {
+      return obj.getPath()
+  }
+  return obj	
+}
+
+// produce project path from the moduleString
+def moduleToProject(moduleString) {
+  def parts = moduleString.split(":")
+  def group = parts[0]
+  def module = parts[1]
+  def version = parts[2]
+  def remainPart = group.replace("${groupPathBase}","")
+  remainPart = remainPart.replace(".",":")
+  def path = remainPart + ":${module}"
+  return path
+}
+
+// We need additionnal tools when working on multi level gradle projects
+
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency
+
+/**
+ * Relative include for subprojects
+ */
+def resolveRelativePath(path) {
+    def remainPart = getRemainingPart(project)
+    String[] parts = remainPart.split(":")
+    String finalPath = ""
+    for(int a = 0; a < parts.length-1; a=a+1) {
+        if(parts[a].size() > 0 ) {
+            finalPath += ":" + parts[a]
+        }
+    }
+    finalPath += path
+    def p = project.findProject(finalPath)
+    if ( p != null ) {
+        if ( System.env.DEBUG ) { println "resolveRelativePath: finalPath=${finalPath},remainPart=${remainPart},path=${path}" }
+        return finalPath
+    } else {
+        String alternativePath = remainPart + path
+        p = project.findProject(alternativePath)
+        if ( p != null ) {
+            if ( System.env.DEBUG ) { println "resolveRelativePath: alternativePath=${alternativePath},path=${path}" }
+            return alternativePath
+        }
+    }
+    throw new RuntimeException("project with path '${path}' not found")
+}
+
+/**
+ * This extends project() function by making it relative.
+ * @param path
+ * @return
+ */
+def projectR(path,obj) {
+    def resolvedPath = resolveRelativePath(path)
+    p "projectR : resolvedPath = ${resolvedPath}"
+    if ( obj == null ) {
+        return project(resolvedPath)
+    } else if ( obj instanceof Closure ) {
+        return project(resolvedPath, obj)
+    } else {
+        println "obj="+obj.getClass() + " not understood by projectR"
+        System.exit(1)
+    }
+}
+ext.set("projectRA",{ String path, Closure closure ->
+    projectR(path, closure)
+})
+ext.set("projectR",{ String path ->
+    projectR(path, null)
+})
+
+// link tasks that need to be
+// (because empty nodes stop the propagation to children projects)
+afterEvaluate {
+    configurations.all { Configuration c ->
+        c.dependencies.all { Dependency dependency ->
+            if (dependency instanceof DefaultProjectDependency) {
+                Project targetProject = dependency.dependencyProject
+                if ( targetProject != project ) {
+                    p "resolve dependency : ${dependency} for ${project}($c)"
+                    Object[] taskTypes = [SourceTask.class, Delete.class, AbstractTestTask.class, Test.class, "test"]
+                    for(Object taskType : taskTypes) {
+                        Object collection
+                        if ( taskType instanceof Class ) {
+                            collection = tasks.withType(taskType)
+                        } else if ( taskType instanceof String ) {
+                            collection = tasks.getByName(taskType)
+                        } else {
+                            println "Error unreconized type for taskType " + taskType.getClass()
+                            System.exit(1)
+                        }
+
+                        for (Task rootTask : collection) {
+                            Task childTask = targetProject.tasks.findByName(rootTask.getName())
+                            if (childTask == null) {
+                                continue;
+                            }
+                            rootTask.dependsOn childTask
+                            rootTask.mustRunAfter childTask
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

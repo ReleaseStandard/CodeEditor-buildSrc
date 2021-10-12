@@ -1,0 +1,29 @@
+// Tweak the dependency resolution mecanism to load projects from the load instead of remote when possible
+
+p("Script inclusion")
+
+configurations {
+	all {
+		resolutionStrategy {
+			dependencySubstitution.all { DependencySubstitution dependency ->
+				if ( requested instanceof ProjectComponentSelector ) {
+					// do nothing
+				}
+				else if ( requested instanceof ModuleComponentSelector )
+				{
+					p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
+					// tweak remote dependencie resolution
+					if ( requested.group.matches("${groupPathBase}.*") ) {
+						def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
+						p("path=${path}")
+						def prj = rootProject.findProject(path)
+						if ( prj != null ) {
+							p("Substitute ${requested.getDisplayName()} to ${prj} because we test")
+							dependency.useTarget(prj, "${explain}")
+						}
+					}
+				}
+			}
+		}
+	}
+}

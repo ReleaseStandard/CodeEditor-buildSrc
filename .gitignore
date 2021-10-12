@@ -18,8 +18,8 @@ shelf/**
 .externalNativeBuild
 .cxx
 local.properties
-build/
-build/*
-build/**
+/build/
+/build/*
+/build/**
 .gradle/
 .gradle/**
