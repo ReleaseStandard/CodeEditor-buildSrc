@@ -56,12 +56,13 @@ configurations {
 					p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
 					// tweak remote dependencie resolution
 					if ( requested.group.matches("${groupPathBase}.*") ) {
-						def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
+						def path = "${requested.group}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":") + ":" + requested.module
 						p("path=${path}")
 						def prj = rootProject.findProject(path)
 						if ( prj != null ) {
 							p("Substitute ${requested.getDisplayName()} to ${prj} because we test")
-							dependency.useTarget(prj, "${explain}")
+							System.err.println("[WARNING] Live modifications have been disabled because we cannot put an evaluation dependency in gradle (or by name)")
+							//dependency.useTarget(prj, "${explain}")
 						}
 					}
 				}
