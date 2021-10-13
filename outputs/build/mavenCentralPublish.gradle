@@ -158,6 +158,9 @@ allprojects { Project prj ->
 							prj.afterEvaluate {
 								from prj.components.java
 							}
+						} else {
+							println "You must specify with component to publish for ${prj}"
+							System.exit(1)
 						}
 
 						pom {
