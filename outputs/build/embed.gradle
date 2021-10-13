@@ -50,7 +50,6 @@ configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
 }
-
 afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
@@ -68,6 +67,9 @@ afterEvaluate {
                 }
             }
         }
+        shadowJar {
+            configurations = [project.configurations.universalEmbed]
+        }
         for (Task t : tasks.withType(Jar)) {
             if (t != shadowJar && t.getName().equals("jar")) {
                 p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
@@ -75,7 +77,6 @@ afterEvaluate {
                 t.dependsOn shadowJar
             }
         }
-        configurations.shadow.extendsFrom(configurations.universalEmbed)
     } else if ( plugins.hasPlugin('com.android.library')) {
         apply plugin: 'com.kezong.fat-aar'
         fataar {
