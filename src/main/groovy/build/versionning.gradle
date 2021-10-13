@@ -3,38 +3,49 @@
 // Manage versions of this project
 // 
 //
+apply plugin: "net.thauvin.erik.gradle.semver"
 task newVersion() {
-        dependsOn incrementMinor
-        mustRunAfter incrementMinor
-        doLast {
-                exec {
-                        commandLine "git"
-                        args "add","version.properties"
-                }
-                exec {
-                        commandLine "git"
-                        args "commit","-m","Version ${version}"
-                }
-                exec {
-                        commandLine "git"
-                        args "tag","${version}"
-                }
+    dependsOn incrementMinor
+    mustRunAfter incrementMinor
+    doLast {
+        exec {
+            commandLine "git"
+            args "add","version.properties"
         }
+        exec {
+            commandLine "git"
+            args "commit","-m","Version ${version}"
+        }
+        exec {
+            commandLine "git"
+            args "tag","${version}"
+        }
+    }
 }
 task version() {
-	doFirst {
-		println "${version}"
-	}
+    doFirst {
+        println "${version}"
+    }
 }
 task versionRelease() {
-	dependsOn "assemble"
-	doLast {
-		println ""
-		println ""
-		println "Then to publish use:"
-		println "    ./gradlew publishToSonatype closeAndReleaseStagingRepository"
-		println ""
-		println ""
-	}
+    dependsOn "assemble"
+    doLast {
+        println ""
+        println ""
+        println "Then to publish use:"
+        println "    ./gradlew publishToSonatype closeAndReleaseStagingRepository"
+        println ""
+        println ""
+    }
+}
+if ( (new File('version.properties')).exists() ) {
+    Properties properties = new Properties()
+    properties.load(project.file("version.properties").newDataInputStream())
+    for(Object k : properties.keySet()) {
+        ext[k] = properties.get(k);
+    }
+    if ( properties.containsKey("version.semver") ) {
+        version = ext["version.semver"]
+    }
 }
 // END

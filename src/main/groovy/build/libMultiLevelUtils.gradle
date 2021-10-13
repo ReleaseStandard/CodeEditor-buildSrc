@@ -33,19 +33,29 @@ def resolveRelativePath(path) {
  */
 def projectR(path,obj) {
     def resolvedPath = resolveRelativePath(path)
-    p "projectR : resolvedPath = ${resolvedPath}"
+    def prj = null
+    def v = "${version}"
     if ( obj == null ) {
-        return project(resolvedPath)
+        prj = project(resolvedPath)
     } else if ( obj instanceof Closure ) {
-        return project(resolvedPath, obj)
+        prj = project(resolvedPath, obj)
+    } else if ( obj instanceof String || obj instanceof GString ) {
+        prj = project(resolvedPath)
+        v = "${obj}"
     } else {
-        println "obj="+obj.getClass() + " not understood by projectR"
+        println "projectR obj="+obj.getClass() + " not understood by projectR"
         System.exit(1)
     }
+    p "projectR ${version}(resolved to ${v}) : resolve ${path}(${resolvedPath}) for ${project}"
+    if ( v!= null ) {
+        prj.setVersion("${v}")
+        prj["version"] = "${v}"
+    }
+    return prj
 }
 
-ext.set("projectRA",{ String path, Closure closure ->
-    projectR(path, closure)
+ext.set("projectRA",{ String path, obj ->
+    projectR(path, obj)
 })
 ext.set("projectR",{ String path ->
     projectR(path, null)

@@ -87,20 +87,20 @@ task sourcesJar(type: Jar) {
 //
 // Maven publish customization and publish
 //
-def isRoot = ( rootProject.compareTo(project) == 0 ) 
+def isRoot = ( rootProject.compareTo(project) == 0 )
 if ( isRoot ) {
 	apply plugin: 'io.github.gradle-nexus.publish-plugin'
- 
+
 	nexusPublishing {
-	        repositories {
-	                sonatype {
-	                        stagingProfileId = sonatypeStagingProfileId
-	                        username = ossrhUsername
-	                        password = ossrhPassword
-	                        nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-	                        snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-	                }
-	        }
+		repositories {
+			sonatype {
+				stagingProfileId = sonatypeStagingProfileId
+				username = ossrhUsername
+				password = ossrhPassword
+				nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+				snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+			}
+		}
 	}
 }
 
@@ -134,7 +134,7 @@ allprojects { Project prj ->
 		p "thisProject=${thisProject.name},prj=${prj.name}"
 
 		if (  ! ( prj.plugins.hasPlugin('com.android.library')
-			|| prj.plugins.hasPlugin('java-library') ) ) {
+				|| prj.plugins.hasPlugin('java-library') ) ) {
 			println "[WARNING] $prj cannot be published to MavenCentral"
 			return
 		}
@@ -171,33 +171,33 @@ allprojects { Project prj ->
 							description = "${prj.name} for CodeEditor"
 							url = "https://github.com/${githubOwner}/CodeEditor-${prj.name}"
 							scm {
-							       connection = "scm:git:github.com/${githubOwner}/CodeEditor-${prj.name}.git"
-							       developerConnection = "scm:git:ssh://github.com/${githubOwner}/CodeEditor-${prj.name}.git"
-							       url = "https://github.com/${githubOwner}/CodeEditor-${prj.name}"
+								connection = "scm:git:github.com/${githubOwner}/CodeEditor-${prj.name}.git"
+								developerConnection = "scm:git:ssh://github.com/${githubOwner}/CodeEditor-${prj.name}.git"
+								url = "https://github.com/${githubOwner}/CodeEditor-${prj.name}"
 							}
 							developers {
-							       developer {
-							               id = "${githubOwner}"
-							               name = "${githubOwnerName}"
-							               email = "${githubOwnerEmail}"
-							       }
+								developer {
+									id = "${githubOwner}"
+									name = "${githubOwnerName}"
+									email = "${githubOwnerEmail}"
+								}
 							}
 							licenses {
-							       license {
-							               name = "The Apache License, Version 2.0"
-							               url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-							       }
+								license {
+									name = "The Apache License, Version 2.0"
+									url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+								}
 							}
 						}
 					}
 				}
 				thisProject.signing {
-				        useInMemoryPgpKeys(
-				                keyId,
-			        	        key,
-			                	password,
-				        )
-				        sign thisProject.publishing.publications."${pubname}"
+					useInMemoryPgpKeys(
+							keyId,
+							key,
+							password,
+					)
+					sign thisProject.publishing.publications."${pubname}"
 				}
 				p "mavenCentralPublish: register " + getPublicationTaskName("${pubname}") + " on $thisProject"
 				try {

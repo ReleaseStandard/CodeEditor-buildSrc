@@ -36,9 +36,9 @@ buildscript {
 // Setup root project
 //
 
-apply plugin: "net.thauvin.erik.gradle.semver"
-
 group = "${getName()}".replace("${rootProject.name}","")
+
+usePlugin(project, "versionning.gradle")
 
 def doesTaskNeedManifold(name) {
     return name.contains("Test") && !name.contains("Fixtures")
@@ -52,14 +52,16 @@ def usePlugin(project, plugin) {
 }
 allprojects { Project p ->
 
-    // forbid extra CodeEditor prefix
-    p.group = p.group.replaceAll("CodeEditor","")
-    p.group = p.group.replaceAll(/\.$/,"")
+    if ( !p.group.matches("${groupPathBase}.*") ) {
+        // forbid extra CodeEditor prefix
+        p.group = p.group.replaceAll("CodeEditor", "")
+        p.group = p.group.replaceAll(/\.$/, "")
 
-    // create the correct group string
-    p.group = "${groupPathBase}${p.group}"
-    p.group = p.group.replaceAll(/\.$/,"")
-    p.group = p.group.replaceAll(/\.\./,".")
+        // create the correct group string
+        p.group = "${groupPathBase}.${p.group}"
+        p.group = p.group.replaceAll(/\.$/, "")
+        p.group = p.group.replaceAll(/\.\./, ".")
+    }
 
     repositories buildScriptRepos
     usePlugin(p, "embed.gradle")
@@ -106,7 +108,6 @@ allprojects { Project p ->
 usePlugin(project, "libMultiLevelUtils.gradle")
 usePlugin(project, "mvcPackaging.gradle")
 usePlugin(project, "multiLevelUtils.gradle")
-usePlugin(project, "versionning.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 
 // for local customization

@@ -50,6 +50,7 @@ configurations {
     universalEmbed
     implementation.extendsFrom(universalEmbed)
 }
+
 afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
