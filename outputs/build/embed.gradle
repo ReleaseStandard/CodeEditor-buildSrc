@@ -55,7 +55,7 @@ afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
-        if ( project.tasks.findByName("jar") == null ) {
+        try {
             project.task("jar", type: Jar, overwrite: true) {
                 doLast {
                     p "this end"
@@ -69,15 +69,17 @@ afterEvaluate {
                     }
                 }
             }
-            shadowJar {
-                configurations = [project.configurations.universalEmbed]
-            }
-            for (Task t : tasks.withType(Jar)) {
-                if (t != shadowJar && t.getName().equals("jar")) {
-                    p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
-                    t.mustRunAfter shadowJar
-                    t.dependsOn shadowJar
-                }
+        } catch(Exception e) {
+            println "Warning : tasks jar for ${project} was already defined"
+        }
+        shadowJar {
+            configurations = [project.configurations.universalEmbed]
+        }
+        for (Task t : tasks.withType(Jar)) {
+            if (t != shadowJar && t.getName().equals("jar")) {
+                p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
+                t.mustRunAfter shadowJar
+                t.dependsOn shadowJar
             }
         }
     } else if ( plugins.hasPlugin('com.android.library')) {
