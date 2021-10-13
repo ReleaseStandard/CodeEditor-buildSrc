@@ -143,7 +143,7 @@ for(String w : whitelist) {
 			p("found subprojects : ${prj}")
 			if (!isAview(prj)) {
 				p("embed ${prj} into ${project}")
-				dependencies.universalEmbed prj
+				dependencies.universalEmbed projectR(prj.getPath())
 			}
 		}
 	}
