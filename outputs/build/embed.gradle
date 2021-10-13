@@ -55,27 +55,29 @@ afterEvaluate {
 
     if (plugins.hasPlugin("java-library")) {
         apply plugin: 'com.github.johnrengelman.shadow'
-        project.task("jar", type: Jar, overwrite: true) {
-            doLast {
-                p "this end"
-                for(TaskOutputs outs : shadowJar.outputs) {
-                    for(File f : outs.files) {
-                        def dest = f.parent+"/"+f.getName().replace("-" + shadowJar.getArchiveClassifier().get(),"")
-                        p "this dest : " + dest
-                        p "this : ${f.getAbsolutePath()}"
-                        f.renameTo(new File(dest))
+        if ( project.tasks.findByName("jar") == null ) {
+            project.task("jar", type: Jar, overwrite: true) {
+                doLast {
+                    p "this end"
+                    for (TaskOutputs outs : shadowJar.outputs) {
+                        for (File f : outs.files) {
+                            def dest = f.parent + "/" + f.getName().replace("-" + shadowJar.getArchiveClassifier().get(), "")
+                            p "this dest : " + dest
+                            p "this : ${f.getAbsolutePath()}"
+                            f.renameTo(new File(dest))
+                        }
                     }
                 }
             }
-        }
-        shadowJar {
-            configurations = [project.configurations.universalEmbed]
-        }
-        for (Task t : tasks.withType(Jar)) {
-            if (t != shadowJar && t.getName().equals("jar")) {
-                p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
-                t.mustRunAfter shadowJar
-                t.dependsOn shadowJar
+            shadowJar {
+                configurations = [project.configurations.universalEmbed]
+            }
+            for (Task t : tasks.withType(Jar)) {
+                if (t != shadowJar && t.getName().equals("jar")) {
+                    p("Add the dependency : ${t}(${t.getClass()}) -> shadowJar")
+                    t.mustRunAfter shadowJar
+                    t.dependsOn shadowJar
+                }
             }
         }
     } else if ( plugins.hasPlugin('com.android.library')) {
