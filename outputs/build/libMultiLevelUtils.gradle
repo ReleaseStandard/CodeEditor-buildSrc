@@ -77,7 +77,6 @@ def projectR(path,obj) {
     def resolvedPath = resolveRelativePath(path)
     def prj = null
     def v = "${version}"
-    p "projectR : resolvedPath = ${resolvedPath}"
     if ( obj == null ) {
         prj = project(resolvedPath)
     } else if ( obj instanceof Closure ) {
@@ -86,14 +85,13 @@ def projectR(path,obj) {
         prj = project(resolvedPath)
         v = "${obj}"
     } else {
-        println "obj="+obj.getClass() + " not understood by projectR"
+        println "projectR obj="+obj.getClass() + " not understood by projectR"
         System.exit(1)
     }
-    // todo : by default put the version name
-    if ( v!= null && v != "unspecified" ) {
-        println "v=${v}"
-        //prj.setVersion("${v}")
-        //prj["version"] = "${v}"
+    p "projectR ${version}(resolved to ${v}) : resolve ${path}(${resolvedPath}) for ${project}"
+    if ( v!= null ) {
+        prj.setVersion("${v}")
+        prj["version"] = "${v}"
     }
     return prj
 }

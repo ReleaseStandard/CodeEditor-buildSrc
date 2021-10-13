@@ -78,9 +78,9 @@ buildscript {
 // Setup root project
 //
 
-apply plugin: "net.thauvin.erik.gradle.semver"
-
 group = "${getName()}".replace("${rootProject.name}","")
+
+usePlugin(project, "versionning.gradle")
 
 def doesTaskNeedManifold(name) {
     return name.contains("Test") && !name.contains("Fixtures")
@@ -150,7 +150,6 @@ allprojects { Project p ->
 usePlugin(project, "libMultiLevelUtils.gradle")
 usePlugin(project, "mvcPackaging.gradle")
 usePlugin(project, "multiLevelUtils.gradle")
-usePlugin(project, "versionning.gradle")
 usePlugin(project, "mavenCentralPublish.gradle")
 
 // for local customization
