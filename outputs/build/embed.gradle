@@ -89,8 +89,10 @@ afterEvaluate {
         }
         configurations.embed.extendsFrom(configurations.universalEmbed)
     } else {
+        // hack
+        apply plugin: 'java-library'
         p("Embed has failed : unknow form")
-        System.exit(1)
+        //System.exit(1)
     }
 
 }

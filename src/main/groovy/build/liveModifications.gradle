@@ -1,25 +1,109 @@
 // Tweak the dependency resolution mecanism to load projects from the load instead of remote when possible
 
-p("Script inclusion")
+// delegate pattern to redirect remote dependencies on local ones
+class ModuleComponentSelectorDelegate implements ModuleComponentSelector {
 
-configurations {
-	all {
-		resolutionStrategy {
-			dependencySubstitution.all { DependencySubstitution dependency ->
-				if ( requested instanceof ProjectComponentSelector ) {
-					// do nothing
-				}
-				else if ( requested instanceof ModuleComponentSelector )
-				{
-					p("${project} trying to resolve : ${requested} : ${requested.group} : ${groupPathBase}")
-					// tweak remote dependencie resolution
-					if ( requested.group.matches("${groupPathBase}.*") ) {
-						def path = "${requested.displayName}".replaceFirst("${groupPathBase}","").replaceAll("\\.", ":")
-						p("path=${path}")
-						def prj = rootProject.findProject(path)
-						if ( prj != null ) {
-							p("Substitute ${requested.getDisplayName()} to ${prj} because we test")
-							dependency.useTarget(prj, "${explain}")
+	class VersionConstraintDelegate implements VersionConstraint {
+		final VersionConstraint delegate;
+
+		public VersionConstraintDelegate(VersionConstraint o) {
+			this.delegate = o;
+		}
+
+		@Override
+		String getBranch() {
+			return delegate.getBranch()
+		}
+
+		@Override
+		String getRequiredVersion() {
+			return ""
+		}
+
+		@Override
+		String getPreferredVersion() {
+			return delegate.getPreferredVersion()
+		}
+
+		@Override
+		String getStrictVersion() {
+			return delegate.getStrictVersion()
+		}
+
+		@Override
+		List<String> getRejectedVersions() {
+			return delegate.getRejectedVersions()
+		}
+
+		@Override
+		String getDisplayName() {
+			return delegate.getDisplayName()
+		}
+	}
+
+	final ModuleComponentSelector delegate;
+
+	public ModuleComponentSelectorDelegate(ModuleComponentSelector o) {
+		this.delegate = o;
+	}
+	@Override
+	String getGroup() {
+		delegate.getGroup();
+	}
+
+	@Override
+	String getModule() {
+		return delegate.getModule()
+	}
+
+	@Override
+	String getVersion() {
+		return ""
+	}
+
+	@Override
+	VersionConstraint getVersionConstraint() {
+		return new VersionConstraintDelegate(delegate.getVersionConstraint())
+	}
+
+	@Override
+	ModuleIdentifier getModuleIdentifier() {
+		return delegate.getModuleIdentifier()
+	}
+
+	@Override
+	String getDisplayName() {
+		return delegate.getDisplayName()
+	}
+
+	@Override
+	boolean matchesStrictly(ComponentIdentifier componentIdentifier) {
+		return delegate.matchesStrictly(componentIdentifier)
+	}
+
+	@Override
+	AttributeContainer getAttributes() {
+		return delegate.getAttributes()
+	}
+
+	@Override
+	List<Capability> getRequestedCapabilities() {
+		return delegate.getRequestedCapabilities()
+	}
+}
+
+if ( rootProject.hasProperty("buildFromLocal") ) {
+	configurations {
+		all {
+			resolutionStrategy {
+				dependencySubstitution.all { DependencySubstitution dependency ->
+					if (requested instanceof ProjectComponentSelector) {
+						// do nothing
+					} else if (requested instanceof ModuleComponentSelector) {
+						// tweak remote dependencie resolution
+						if (requested.group.matches("${groupPathBase}.*")) {
+							p("Resolving ${requested} to local artifact")
+							dependency.useTarget(new ModuleComponentSelectorDelegate(requested))
 						}
 					}
 				}
